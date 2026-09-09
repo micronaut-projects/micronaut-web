@@ -169,4 +169,3 @@ export function GuideVariantPreferencePicker({
     </div>
   );
 }
-

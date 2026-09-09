@@ -754,7 +754,6 @@ test("navbar language change updates docs snippets in real time", async ({
   expect(failures).toEqual([]);
 });
 
-
 function collectBrowserFailures(page: Page) {
   const failures: string[] = [];
   page.on("pageerror", (error) => {
