@@ -300,12 +300,11 @@ test("homepage addresses PageSpeed image and accessibility findings", async ({
 test("the hero release refreshes in the browser and survives a failed request", async ({
   page,
 }) => {
-  // Preview hosts are not on the launch.micronaut.io CORS allowlist, so the
-  // refresh reads the GitHub API here. Failing it proves the build-time
-  // version still stands on its own.
+  // Failing the GitHub request proves the build-time version still stands on
+  // its own.
   await page.route("https://api.github.com/**", (route) => route.abort());
   const releaseRequest = page.waitForRequest(
-    "https://api.github.com/repos/micronaut-projects/micronaut-starter/releases",
+    "https://api.github.com/repos/micronaut-projects/micronaut-platform/releases",
   );
 
   await page.goto(appPath("/"));

@@ -17,7 +17,7 @@ import SiteFooter from "@/components/web/site-footer.astro";
 import StoryLogo from "@/components/web/story-logo.astro";
 import { withBasePath } from "@/lib/base-path";
 import { highlightCodeSnippetExamples } from "@/lib/docs-code-highlighting";
-import { latestStarterRelease } from "@/lib/latest-starter-release";
+import { latestMicronautRelease } from "@/lib/latest-micronaut-release";
 import { getMainCodeShowcaseExamples } from "@/lib/main-code-showcase-content";
 import { getSuccessStories } from "@/lib/main-site-content";
 import { logoSource } from "@/lib/story-logo-assets";
@@ -279,7 +279,7 @@ const buildTimeWins = [
 const highlightedCodeShowcaseExamples = await highlightCodeSnippetExamples(
   await getMainCodeShowcaseExamples(),
 );
-const release = await latestStarterRelease();
+const release = await latestMicronautRelease();
 // Sheen sweeping across the visor: a band bowed onto the visor's curve rather
 // than a straight bar laid over it. Its soft edges are stacked strokes of
 // shrinking width, because a linear gradient can only fade sideways across a
