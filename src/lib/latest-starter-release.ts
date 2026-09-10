@@ -4,8 +4,13 @@ export type StarterRelease = {
   binaryUrl: string;
 };
 
-const latestReleaseUrl =
-  "https://api.github.com/repos/micronaut-projects/micronaut-starter/releases/latest";
+/**
+ * The release list rather than `releases/latest`: GitHub's "latest" is the most
+ * recently published release, which is a maintenance patch such as 4.10.x
+ * whenever one ships after the current line. `newestRelease` picks from it.
+ */
+const releasesUrl =
+  "https://api.github.com/repos/micronaut-projects/micronaut-starter/releases";
 
 const launchVersionsUrl = "https://launch.micronaut.io/versions";
 
@@ -24,7 +29,31 @@ export type ReleaseSource = { kind: "launch" | "github"; url: string };
 export function releaseSourceFor(hostname: string): ReleaseSource {
   return launchCorsHosts.has(hostname)
     ? { kind: "launch", url: launchVersionsUrl }
-    : { kind: "github", url: latestReleaseUrl };
+    : { kind: "github", url: releasesUrl };
+}
+
+type GitHubRelease = {
+  tag_name?: unknown;
+  draft?: unknown;
+  prerelease?: unknown;
+};
+
+/** The highest stable version in a GitHub release list, by version number. */
+export function newestRelease<T extends GitHubRelease>(
+  releases: T[],
+): T | undefined {
+  const parts = (release: T) =>
+    typeof release.tag_name === "string"
+      ? /^v?(\d+)\.(\d+)\.(\d+)$/.exec(release.tag_name)?.slice(1).map(Number)
+      : undefined;
+  return releases
+    .filter(
+      (release) => !release.draft && !release.prerelease && parts(release),
+    )
+    .sort((a, b) => {
+      const [x, y] = [parts(a)!, parts(b)!];
+      return y[0] - x[0] || y[1] - x[1] || y[2] - x[2];
+    })[0];
 }
 
 /** Reads the version out of whichever payload `releaseSourceFor` selected. */
@@ -37,7 +66,9 @@ export function versionFromReleasePayload(
       ? (payload as { versions?: Record<string, unknown> })?.versions?.[
           "micronaut.version"
         ]
-      : (payload as { tag_name?: unknown })?.tag_name;
+      : Array.isArray(payload)
+        ? newestRelease(payload)?.tag_name
+        : undefined;
   if (typeof raw !== "string") {
     return undefined;
   }
@@ -65,30 +96,35 @@ let releasePromise: Promise<StarterRelease | undefined> | undefined;
  * does not answer.
  */
 export function latestStarterRelease(): Promise<StarterRelease | undefined> {
-  return (releasePromise ??= fetch(latestReleaseUrl, {
+  return (releasePromise ??= fetch(releasesUrl, {
     headers: { Accept: "application/vnd.github+json" },
     signal: AbortSignal.timeout(10_000),
   })
     .then((response) => {
       if (!response.ok) {
         throw new Error(
-          `GitHub latest release request failed with ${response.status}`,
+          `GitHub releases request failed with ${response.status}`,
         );
       }
-      return response.json() as Promise<{
-        tag_name: string;
-        html_url: string;
-        assets: Array<{ name: string; browser_download_url: string }>;
-      }>;
+      return response.json() as Promise<
+        Array<{
+          tag_name: string;
+          draft: boolean;
+          prerelease: boolean;
+          html_url: string;
+          assets: Array<{ name: string; browser_download_url: string }>;
+        }>
+      >;
     })
-    .then((release) => {
-      const version = release.tag_name.replace(/^v/, "");
-      const binary = release.assets.find(
+    .then((releases) => {
+      const release = newestRelease(releases);
+      const version = release?.tag_name.replace(/^v/, "");
+      const binary = release?.assets.find(
         (asset) => asset.name === `micronaut-cli-${version}.zip`,
       );
-      if (!version || !binary) {
+      if (!release || !version || !binary) {
         throw new Error(
-          "GitHub latest release is missing the Micronaut CLI ZIP asset",
+          "GitHub newest release is missing the Micronaut CLI ZIP asset",
         );
       }
       return {

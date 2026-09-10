@@ -305,7 +305,7 @@ test("the hero release refreshes in the browser and survives a failed request", 
   // version still stands on its own.
   await page.route("https://api.github.com/**", (route) => route.abort());
   const releaseRequest = page.waitForRequest(
-    "https://api.github.com/repos/micronaut-projects/micronaut-starter/releases/latest",
+    "https://api.github.com/repos/micronaut-projects/micronaut-starter/releases",
   );
 
   await page.goto(appPath("/"));
