@@ -41,18 +41,26 @@ describe("versionFromReleasePayload", () => {
     );
   });
 
-  test("drops the tag prefix GitHub releases carry", () => {
+  test("picks the highest GitHub release, not the last one published", () => {
+    // Listed newest-published first, as GitHub returns them.
     assert.equal(
-      versionFromReleasePayload("github", { tag_name: "v5.1.2" }),
-      "5.1.2",
+      versionFromReleasePayload("github", [
+        { tag_name: "v4.10.18", draft: false, prerelease: false },
+        { tag_name: "v5.2.0-RC1", draft: false, prerelease: true },
+        { tag_name: "v5.2.0", draft: true, prerelease: false },
+        { tag_name: "v5.1.10", draft: false, prerelease: false },
+        { tag_name: "v5.1.9", draft: false, prerelease: false },
+      ]),
+      "5.1.10",
     );
   });
 
   test("rejects anything that would build a link to a missing tag", () => {
     for (const payload of [
       {},
-      { tag_name: 5 },
-      { tag_name: "latest" },
+      [],
+      [{ tag_name: 5 }],
+      [{ tag_name: "latest" }],
       { versions: {} },
     ]) {
       assert.equal(versionFromReleasePayload("github", payload), undefined);
