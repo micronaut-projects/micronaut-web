@@ -29,7 +29,6 @@ import {
   renderFaqItems,
   renderMarkdownHtml,
 } from "@/lib/main-site-content";
-import { withLatestStarterRelease } from "@/lib/latest-starter-release";
 
 export async function getStaticPaths() {
   const mainSitePages = await getMainSitePages();
@@ -148,10 +147,6 @@ const contentHtml =
   entry && !isBlogArchiveRoute && !rendersFaqAccordion
     ? await renderMarkdownHtml(entry)
     : "";
-const pageHtml =
-  routeSlug === "download"
-    ? await withLatestStarterRelease(contentHtml)
-    : contentHtml;
 const successStories = await getSuccessStories();
 const postDateFormatter = new Intl.DateTimeFormat("en", {
   day: "numeric",
@@ -338,14 +333,14 @@ const olderPost =
           ) : (
             <>
               <MainSiteMarkdown
-                html={pageHtml}
+                html={contentHtml}
                 variantClass={
                   routeSlug.startsWith("brand-guidelines")
                     ? "main-site-markdown--brand"
                     : undefined
                 }
               />
-              {pageHtml && <GeneratedDocsStaticEnhancer />}
+              {contentHtml && <GeneratedDocsStaticEnhancer />}
             </>
           )}
 
@@ -493,7 +488,3 @@ const olderPost =
   }
   <SiteFooter />
 </WebLayout>
-
-<script>
-  import "@/scripts/latest-release-refresh";
-</script>
