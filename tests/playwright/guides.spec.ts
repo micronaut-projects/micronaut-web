@@ -500,177 +500,6 @@ test("generated guide pages are rendered from real sources with converted snippe
   expect(failures).toEqual([]);
 });
 
-test("navbar Kotlin selection immediately updates the Guides language picker", async ({
-  page,
-}) => {
-  const failures = collectBrowserFailures(page);
-
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto(appPath("/guides/"));
-
-  const headerIsland = page.locator(
-    'astro-island[component-export="SiteHeader"]',
-  );
-  await expect
-    .poll(() => headerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-
-  const guidePickerIsland = page.locator(
-    'astro-island[component-export="GuideVariantPreferencePicker"]',
-  );
-  await expect
-    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-
-  await page
-    .locator("header")
-    .getByRole("button", { name: "Programming language preference" })
-    .click();
-  await page.getByRole("menuitem", { name: "Kotlin" }).click();
-
-  await expect(
-    page
-      .locator("header")
-      .getByRole("button", { name: "Programming language preference" }),
-  ).toContainText("Kotlin");
-
-  await expect(
-    page
-      .getByRole("group", { name: "Preferred guide language" })
-      .getByRole("button", { name: "Kotlin" }),
-  ).toHaveAttribute("aria-pressed", "true");
-
-  expect(failures).toEqual([]);
-});
-
-test("navbar Java selection immediately updates the Guides language picker", async ({
-  page,
-  context,
-}) => {
-  const failures = collectBrowserFailures(page);
-
-  await context.addCookies([
-    {
-      name: "micronaut-code-language",
-      value: "kotlin",
-      url: appPath("/guides/"),
-      path: "/",
-    },
-  ]);
-
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto(appPath("/guides/"));
-
-  const headerIsland = page.locator(
-    'astro-island[component-export="SiteHeader"]',
-  );
-  await expect
-    .poll(() => headerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-  const guidePickerIsland = page.locator(
-    'astro-island[component-export="GuideVariantPreferencePicker"]',
-  );
-  await expect
-    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-
-  await page
-    .locator("header")
-    .getByRole("button", { name: "Programming language preference" })
-    .click();
-  await page.getByRole("menuitem", { name: "Java" }).click();
-
-  await expect(
-    page
-      .locator("header")
-      .getByRole("button", { name: "Programming language preference" }),
-  ).toContainText("Java");
-
-  await expect(
-    page
-      .getByRole("group", { name: "Preferred guide language" })
-      .getByRole("button", { name: "Java" }),
-  ).toHaveAttribute("aria-pressed", "true");
-
-  expect(failures).toEqual([]);
-});
-
-test("Guides Groovy selection immediately updates the navbar language selector", async ({
-  page,
-}) => {
-  const failures = collectBrowserFailures(page);
-
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto(appPath("/guides/"));
-
-  const headerIsland = page.locator(
-    'astro-island[component-export="SiteHeader"]',
-  );
-  await expect
-    .poll(() => headerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-  const guidePickerIsland = page.locator(
-    'astro-island[component-export="GuideVariantPreferencePicker"]',
-  );
-  await expect
-    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-
-  await page
-    .getByRole("group", { name: "Preferred guide language" })
-    .getByRole("button", { name: "Groovy" })
-    .click();
-
-  await expect(
-    page
-      .getByRole("group", { name: "Preferred guide language" })
-      .getByRole("button", { name: "Groovy" }),
-  ).toHaveAttribute("aria-pressed", "true");
-
-  await expect(
-    page
-      .locator("header")
-      .getByRole("button", { name: "Programming language preference" }),
-  ).toContainText("Groovy");
-
-  expect(failures).toEqual([]);
-});
-
-test("Guides Kotlin selection immediately updates the navbar language selector", async ({
-  page,
-}) => {
-  const failures = collectBrowserFailures(page);
-
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto(appPath("/guides/"));
-
-  const headerIsland = page.locator(
-    'astro-island[component-export="SiteHeader"]',
-  );
-  await expect
-    .poll(() => headerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-  const guidePickerIsland = page.locator(
-    'astro-island[component-export="GuideVariantPreferencePicker"]',
-  );
-  await expect
-    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-
-  await page
-    .getByRole("group", { name: "Preferred guide language" })
-    .getByRole("button", { name: "Kotlin" })
-    .click();
-
-  await expect(
-    page
-      .locator("header")
-      .getByRole("button", { name: "Programming language preference" }),
-  ).toContainText("Kotlin");
-
-  expect(failures).toEqual([]);
-});
-
 test("Guides language selection updates the global cookie", async ({
   page,
   context,
@@ -700,6 +529,35 @@ test("Guides language selection updates the global cookie", async ({
   expect(failures).toEqual([]);
 });
 
+test("Guides build-tool selection updates the global cookie", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(appPath("/guides/"));
+
+  const guidePickerIsland = page.locator(
+    'astro-island[component-export="GuideVariantPreferencePicker"]',
+  );
+  await expect
+    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
+    .toBe(true);
+
+  await page
+    .getByRole("group", { name: "Preferred guide build tool" })
+    .getByRole("button", { name: "Maven" })
+    .click();
+
+  const cookies = await context.cookies();
+  const buildCookie = cookies.find((c) => c.name === "micronaut-build-tool");
+  expect(buildCookie).toBeDefined();
+  expect(buildCookie?.value).toBe("maven");
+
+  expect(failures).toEqual([]);
+});
+
 test("language preference persists after page refresh when set via Guides picker", async ({
   page,
 }) => {
@@ -722,12 +580,6 @@ test("language preference persists after page refresh when set via Guides picker
 
   await page.reload();
 
-  const headerIsland = page.locator(
-    'astro-island[component-export="SiteHeader"]',
-  );
-  await expect
-    .poll(() => headerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
   const guidePickerIsland2 = page.locator(
     'astro-island[component-export="GuideVariantPreferencePicker"]',
   );
@@ -737,57 +589,8 @@ test("language preference persists after page refresh when set via Guides picker
 
   await expect(
     page
-      .locator("header")
-      .getByRole("button", { name: "Programming language preference" }),
-  ).toContainText("Groovy");
-  await expect(
-    page
       .getByRole("group", { name: "Preferred guide language" })
       .getByRole("button", { name: "Groovy" }),
-  ).toHaveAttribute("aria-pressed", "true");
-
-  expect(failures).toEqual([]);
-});
-
-test("build-tool selection is preserved when language changes via the navbar", async ({
-  page,
-}) => {
-  const failures = collectBrowserFailures(page);
-
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto(appPath("/guides/"));
-
-  await page.evaluate(() => {
-    localStorage.setItem(
-      "micronaut-guides-variant-preference",
-      JSON.stringify({ language: "java", buildTool: "maven" }),
-    );
-  });
-  await page.reload();
-
-  const headerIsland = page.locator(
-    'astro-island[component-export="SiteHeader"]',
-  );
-  await expect
-    .poll(() => headerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-  const guidePickerIsland = page.locator(
-    'astro-island[component-export="GuideVariantPreferencePicker"]',
-  );
-  await expect
-    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
-    .toBe(true);
-
-  await page
-    .locator("header")
-    .getByRole("button", { name: "Programming language preference" })
-    .click();
-  await page.getByRole("menuitem", { name: "Groovy" }).click();
-
-  await expect(
-    page
-      .getByRole("group", { name: "Preferred guide build tool" })
-      .getByRole("button", { name: "Maven" }),
   ).toHaveAttribute("aria-pressed", "true");
 
   expect(failures).toEqual([]);

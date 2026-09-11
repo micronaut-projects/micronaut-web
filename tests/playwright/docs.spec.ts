@@ -722,7 +722,7 @@ test("global language does not break local snippet tab override", async ({
   expect(failures).toEqual([]);
 });
 
-test("navbar language change updates docs snippets in real time", async ({
+test("global build-tool change updates docs snippets in real time", async ({
   page,
 }) => {
   const failures = collectBrowserFailures(page);
@@ -733,22 +733,22 @@ test("navbar language change updates docs snippets in real time", async ({
   const root = page.locator("[data-generated-docs]");
   await expect(root).toBeVisible();
 
-  const firstKotlinTab = root
+  const firstMavenTab = root
     .locator(".docs-code-snippet-template")
-    .locator("button[role='tab'][data-lang='kotlin']")
+    .locator("button[role='tab'][data-lang='maven']")
     .first();
 
-  const count = await firstKotlinTab.count();
+  const count = await firstMavenTab.count();
   if (count > 0) {
     await page.evaluate(() => {
       window.dispatchEvent(
-        new CustomEvent("micronaut-web-language-change", {
-          detail: { language: "kotlin" },
+        new CustomEvent("micronaut-web-build-tool-change", {
+          detail: { buildTool: "maven" },
         }),
       );
     });
 
-    await expect(firstKotlinTab).toHaveAttribute("aria-selected", "true");
+    await expect(firstMavenTab).toHaveAttribute("aria-selected", "true");
   }
 
   expect(failures).toEqual([]);
