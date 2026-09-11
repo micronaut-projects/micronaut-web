@@ -50,3 +50,18 @@ window.addEventListener(PROGRAMMING_LANGUAGE_EVENT, (event) => {
     }),
   );
 });
+
+window.addEventListener("micronaut-web-build-tool-change", (event) => {
+  const detail = (event as CustomEvent<{ buildTool?: string }>).detail;
+  if (detail?.buildTool !== "gradle" && detail?.buildTool !== "maven") {
+    return;
+  }
+  const existing = readGuideVariantPreference();
+  const currentLanguage = existing?.language ?? "java";
+  saveGuideVariantPreference(
+    normalizeGuidePreference({
+      language: currentLanguage,
+      buildTool: detail.buildTool,
+    }),
+  );
+});

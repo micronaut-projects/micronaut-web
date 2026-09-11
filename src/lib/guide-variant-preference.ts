@@ -1,4 +1,8 @@
 import { readProgrammingLanguageCookiePreference } from "@/lib/programming-language-preference";
+import {
+  readBuildToolCookiePreference,
+  saveBuildToolPreference,
+} from "@/lib/build-tool-preference";
 
 export type GuideVariantPreference = {
   language: string;
@@ -70,11 +74,18 @@ export function readGuideVariantPreference():
   }
 
   const globalLanguage = readProgrammingLanguageCookiePreference();
-  if (globalLanguage) {
+  const globalBuildTool = readBuildToolCookiePreference();
+
+  if (globalLanguage || globalBuildTool) {
     return normalizeGuidePreference({
-      language: globalLanguage,
+      language:
+        globalLanguage ??
+        stored?.language ??
+        DEFAULT_GUIDE_VARIANT_PREFERENCE.language,
       buildTool:
-        stored?.buildTool ?? DEFAULT_GUIDE_VARIANT_PREFERENCE.buildTool,
+        globalBuildTool ??
+        stored?.buildTool ??
+        DEFAULT_GUIDE_VARIANT_PREFERENCE.buildTool,
     });
   }
   return stored ? normalizeGuidePreference(stored) : undefined;
@@ -89,6 +100,11 @@ export function saveGuideVariantPreference(preference: GuideVariantPreference) {
   } catch {
     // The change event still updates the current page without storage.
   }
+
+  if (isGuideBuildTool(preference.buildTool)) {
+    saveBuildToolPreference(preference.buildTool);
+  }
+
   window.dispatchEvent(
     new CustomEvent<GuideVariantPreference>(GUIDE_VARIANT_PREFERENCE_EVENT, {
       detail: preference,

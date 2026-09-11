@@ -112,6 +112,12 @@ import {
         const language = tabs[nextIndex]?.dataset.lang;
         if (isProgrammingLanguage(language)) {
           saveProgrammingLanguagePreference(language);
+        } else if (language === "gradle" || language === "maven") {
+          import("@/lib/build-tool-preference")
+            .then(({ saveBuildToolPreference }) => {
+              saveBuildToolPreference(language as any);
+            })
+            .catch(() => {});
         }
       }
     };
@@ -209,6 +215,14 @@ import {
     }
   });
 
+  window.addEventListener("micronaut-web-build-tool-change", (event) => {
+    const detail = (event as CustomEvent<{ buildTool?: string }>).detail;
+    const buildTool = detail?.buildTool;
+    if (buildTool === "gradle" || buildTool === "maven") {
+      applyGlobalLanguagePreference(buildTool);
+    }
+  });
+
   const init = () => {
     document
       .querySelectorAll<HTMLElement>("[data-generated-docs]")
@@ -225,6 +239,14 @@ import {
     if (preferredLanguage) {
       applyGlobalLanguagePreference(preferredLanguage);
     }
+    import("@/lib/build-tool-preference")
+      .then(({ readBuildToolCookiePreference }) => {
+        const preferredBuildTool = readBuildToolCookiePreference();
+        if (preferredBuildTool) {
+          applyGlobalLanguagePreference(preferredBuildTool);
+        }
+      })
+      .catch(() => {});
     document.documentElement.removeAttribute("data-code-language-pending");
   };
 
