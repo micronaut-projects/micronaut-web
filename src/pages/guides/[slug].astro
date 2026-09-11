@@ -10,6 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import GeneratedDocsStaticEnhancer from "@/components/web/generated-docs-static-enhancer.astro";
 import LatestGuidesCatalog from "@/components/web/latest-guides-catalog.astro";
+import { GuideVariantPreferencePicker } from "@/components/web/guide-variant-preference";
 import { ArrowUp } from "lucide-react";
 import {
   GUIDES_ROOT,
@@ -280,6 +281,9 @@ function buildGuidePageIndexSections(
           </div>
         </aside>
         <article class="min-w-0">
+          <div class="mb-6">
+            <GuideVariantPreferencePicker client:load />
+          </div>
           <header class="mb-8">
             <nav
               aria-label="Breadcrumb"

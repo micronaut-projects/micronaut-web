@@ -216,15 +216,19 @@ const structuredData = {
     </script>
     <script is:inline>
       (() => {
-        const cookie = document.cookie
-          .split(";")
-          .map((value) => value.trim())
-          .find((value) => value.startsWith("micronaut-code-language="));
-        const language = cookie?.slice("micronaut-code-language=".length);
+        const cookies = document.cookie.split(";").map((value) => value.trim());
+        const langCookie = cookies.find((value) =>
+          value.startsWith("micronaut-code-language="),
+        );
+        const buildCookie = cookies.find((value) =>
+          value.startsWith("micronaut-build-tool="),
+        );
+        const language = langCookie?.slice("micronaut-code-language=".length);
+        const buildTool = buildCookie?.slice("micronaut-build-tool=".length);
         if (
           language === "kotlin" ||
           language === "groovy" ||
-          language === "python"
+          buildTool === "maven"
         ) {
           document.documentElement.dataset.codeLanguagePending = "true";
         }

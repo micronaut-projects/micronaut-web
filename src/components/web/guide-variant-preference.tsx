@@ -95,8 +95,28 @@ export function GuideVariantPreferencePicker({
       });
     }
 
+    function onGlobalBuildToolChange(event: Event) {
+      const detail = (event as CustomEvent<{ buildTool?: string }>).detail;
+      const buildTool = detail?.buildTool;
+      if (buildTool !== "gradle" && buildTool !== "maven") {
+        return;
+      }
+      setPreference((current) => {
+        if (current.buildTool === buildTool) {
+          return current;
+        }
+        const next = { language: current.language, buildTool };
+        Promise.resolve().then(() => saveGuideVariantPreference(next));
+        return next;
+      });
+    }
+
     window.addEventListener(GUIDE_VARIANT_PREFERENCE_EVENT, onPreferenceChange);
     window.addEventListener(PROGRAMMING_LANGUAGE_EVENT, onGlobalLanguageChange);
+    window.addEventListener(
+      "micronaut-web-build-tool-change",
+      onGlobalBuildToolChange,
+    );
     return () => {
       window.removeEventListener(
         GUIDE_VARIANT_PREFERENCE_EVENT,
@@ -105,6 +125,10 @@ export function GuideVariantPreferencePicker({
       window.removeEventListener(
         PROGRAMMING_LANGUAGE_EVENT,
         onGlobalLanguageChange,
+      );
+      window.removeEventListener(
+        "micronaut-web-build-tool-change",
+        onGlobalBuildToolChange,
       );
     };
   }, []);
