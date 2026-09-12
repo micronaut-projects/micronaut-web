@@ -629,7 +629,7 @@ test("global language cookie defaults docs snippets to Kotlin on load", async ({
     {
       name: "micronaut-code-language",
       value: "kotlin",
-      url: appPath("/docs/core/"),
+      domain: "127.0.0.1",
       path: "/",
     },
   ]);
@@ -663,7 +663,7 @@ test("global language cookie defaults docs snippets to Groovy on load", async ({
     {
       name: "micronaut-code-language",
       value: "groovy",
-      url: appPath("/docs/core/"),
+      domain: "127.0.0.1",
       path: "/",
     },
   ]);
@@ -697,7 +697,7 @@ test("global language does not break local snippet tab override", async ({
     {
       name: "micronaut-code-language",
       value: "kotlin",
-      url: appPath("/docs/core/"),
+      domain: "127.0.0.1",
       path: "/",
     },
   ]);
