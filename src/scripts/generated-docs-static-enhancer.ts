@@ -1,3 +1,10 @@
+import {
+  isProgrammingLanguage,
+  PROGRAMMING_LANGUAGE_EVENT,
+  readProgrammingLanguageCookiePreference,
+  saveProgrammingLanguagePreference,
+} from "@/lib/programming-language-preference";
+
 (() => {
   const snippetText = (block: Element) => {
     const code = block.querySelector("code");
@@ -85,7 +92,7 @@
       tabs.findIndex((tab) => tab.getAttribute("aria-selected") === "true"),
     );
 
-    const activate = (nextIndex: number) => {
+    const activate = (nextIndex: number, persistGlobally = false) => {
       activeIndex = nextIndex;
       panels.forEach((panel, index) => {
         const active = index === activeIndex;
@@ -101,10 +108,27 @@
         tab.classList.toggle("text-code-foreground", active);
         tab.classList.toggle("text-code-muted", !active);
       });
+      if (persistGlobally) {
+        const language = tabs[nextIndex]?.dataset.lang;
+        if (isProgrammingLanguage(language)) {
+          saveProgrammingLanguagePreference(language);
+        } else if (language === "gradle" || language === "maven") {
+          import("@/lib/build-tool-preference")
+            .then(({ saveBuildToolPreference }) => {
+              saveBuildToolPreference(language as any);
+            })
+            .catch(() => {});
+        }
+      }
     };
 
     tabs.forEach((tab, index) => {
-      tab.addEventListener("click", () => activate(index));
+      tab.addEventListener("click", () => {
+        const persistGlobally =
+          template.dataset.globalLanguageApplication !== "true";
+        delete template.dataset.globalLanguageApplication;
+        activate(index, persistGlobally);
+      });
       tab.addEventListener("keydown", (event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") {
           return;
@@ -112,7 +136,7 @@
         event.preventDefault();
         const offset = event.key === "ArrowRight" ? 1 : -1;
         const nextIndex = (index + offset + tabs.length) % tabs.length;
-        activate(nextIndex);
+        activate(nextIndex, true);
         tabs[nextIndex]?.focus();
       });
     });
@@ -150,6 +174,55 @@
     });
   };
 
+  /**
+   * Given a snippet template, activate the tab that matches
+   * `language`, if one exists. Does nothing if no matching tab is found,
+   * preserving any existing local selection.
+   */
+  const applyLanguageToTemplate = (template: HTMLElement, language: string) => {
+    const tabs = Array.from(
+      template.querySelectorAll<HTMLElement>(
+        ".docs-snippet-tabs button[role='tab'][data-lang]",
+      ),
+    );
+    const matchIndex = tabs.findIndex((tab) => tab.dataset.lang === language);
+    if (matchIndex < 0) {
+      return;
+    }
+    // Re-use the existing activate logic that was already bound; simulate a click.
+    template.dataset.globalLanguageApplication = "true";
+    tabs[matchIndex]?.click();
+  };
+
+  /**
+   * Apply the current language preference to all already enhanced snippet
+   * templates under [data-generated-docs].
+   */
+  const applyGlobalLanguagePreference = (language: string) => {
+    document
+      .querySelectorAll<HTMLElement>(".docs-snippet-template")
+      .forEach((template) => {
+        applyLanguageToTemplate(template, language);
+      });
+  };
+
+  // Listen for language changes from the navbar selector.
+  window.addEventListener(PROGRAMMING_LANGUAGE_EVENT, (event) => {
+    const detail = (event as CustomEvent<{ language?: string }>).detail;
+    const language = detail?.language;
+    if (language && isProgrammingLanguage(language)) {
+      applyGlobalLanguagePreference(language);
+    }
+  });
+
+  window.addEventListener("micronaut-web-build-tool-change", (event) => {
+    const detail = (event as CustomEvent<{ buildTool?: string }>).detail;
+    const buildTool = detail?.buildTool;
+    if (buildTool === "gradle" || buildTool === "maven") {
+      applyGlobalLanguagePreference(buildTool);
+    }
+  });
+
   const init = () => {
     document
       .querySelectorAll<HTMLElement>("[data-generated-docs]")
@@ -161,6 +234,20 @@
         stabilizeGeneratedImages(root);
         enhanceTemplateSnippetControls(root);
       });
+    // Apply global language preference to all snippets.
+    const preferredLanguage = readProgrammingLanguageCookiePreference();
+    if (preferredLanguage) {
+      applyGlobalLanguagePreference(preferredLanguage);
+    }
+    import("@/lib/build-tool-preference")
+      .then(({ readBuildToolCookiePreference }) => {
+        const preferredBuildTool = readBuildToolCookiePreference();
+        if (preferredBuildTool) {
+          applyGlobalLanguagePreference(preferredBuildTool);
+        }
+      })
+      .catch(() => {});
+    document.documentElement.removeAttribute("data-code-language-pending");
   };
 
   if (document.readyState === "loading") {

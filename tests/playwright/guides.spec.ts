@@ -501,6 +501,102 @@ test("generated guide pages are rendered from real sources with converted snippe
   expect(failures).toEqual([]);
 });
 
+test("Guides language selection updates the global cookie", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(appPath("/guides/"));
+
+  const guidePickerIsland = page.locator(
+    'astro-island[component-export="GuideVariantPreferencePicker"]',
+  );
+  await expect
+    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
+    .toBe(true);
+
+  await page
+    .getByRole("group", { name: "Preferred guide language" })
+    .getByRole("button", { name: "Kotlin" })
+    .click();
+
+  const cookies = await context.cookies();
+  const langCookie = cookies.find((c) => c.name === "micronaut-code-language");
+  expect(langCookie).toBeDefined();
+  expect(langCookie?.value).toBe("kotlin");
+
+  expect(failures).toEqual([]);
+});
+
+test("Guides build-tool selection updates the global cookie", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(appPath("/guides/"));
+
+  const guidePickerIsland = page.locator(
+    'astro-island[component-export="GuideVariantPreferencePicker"]',
+  );
+  await expect
+    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
+    .toBe(true);
+
+  await page
+    .getByRole("group", { name: "Preferred guide build tool" })
+    .getByRole("button", { name: "Maven" })
+    .click();
+
+  const cookies = await context.cookies();
+  const buildCookie = cookies.find((c) => c.name === "micronaut-build-tool");
+  expect(buildCookie).toBeDefined();
+  expect(buildCookie?.value).toBe("maven");
+
+  expect(failures).toEqual([]);
+});
+
+test("language preference persists after page refresh when set via Guides picker", async ({
+  page,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(appPath("/guides/"));
+
+  const guidePickerIsland = page.locator(
+    'astro-island[component-export="GuideVariantPreferencePicker"]',
+  );
+  await expect
+    .poll(() => guidePickerIsland.evaluate((el) => !el.hasAttribute("ssr")))
+    .toBe(true);
+
+  await page
+    .getByRole("group", { name: "Preferred guide language" })
+    .getByRole("button", { name: "Groovy" })
+    .click();
+
+  await page.reload();
+
+  const guidePickerIsland2 = page.locator(
+    'astro-island[component-export="GuideVariantPreferencePicker"]',
+  );
+  await expect
+    .poll(() => guidePickerIsland2.evaluate((el) => !el.hasAttribute("ssr")))
+    .toBe(true);
+
+  await expect(
+    page
+      .getByRole("group", { name: "Preferred guide language" })
+      .getByRole("button", { name: "Groovy" }),
+  ).toHaveAttribute("aria-pressed", "true");
+
+  expect(failures).toEqual([]);
+});
+
 async function expectGuideCallouts(
   content: Locator,
   expectedCallouts: string[][],

@@ -204,7 +204,7 @@ function sortGuides(items: GeneratedGuide[], mode: SortMode) {
     <div
       class="mt-6 grid gap-3 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center"
     >
-      <GuideVariantPreferencePicker client:idle python={pythonGuideCount > 0} />
+      <GuideVariantPreferencePicker client:load />
       {
         pythonGuideCount > 0 && (
           <a

@@ -329,3 +329,10 @@ function routedDocsHref(href: string) {
     enhanceDocsVersionSelectors();
   }
 </script>
+
+<style>
+  :global([data-docs-version-select] option) {
+    color: var(--sidebar-foreground);
+    background-color: var(--sidebar);
+  }
+</style>

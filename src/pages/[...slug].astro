@@ -123,6 +123,10 @@ const isFaqPage = routeSlug === "faq";
 const isCommercialSupportPage = routeSlug === "support";
 const isReleaseAnnouncementsArchive =
   routeSlug === "category/release-announcements";
+const isReleaseAnnouncementPost =
+  post &&
+  (post.entry.data.category === "release-announcements" ||
+    post.entry.data.categories.includes("release-announcements"));
 const isMinimalArchive =
   isReleaseAnnouncementsArchive ||
   routeSlug === "blog" ||
@@ -153,10 +157,12 @@ const postDateFormatter = new Intl.DateTimeFormat("en", {
   month: "short",
   year: "numeric",
 });
-// Neighbors in the blog's date-descending order, for prev/next links on posts.
 const blogSeries = post
-  ? (await getBlogPosts()).filter(
-      (candidate) => candidate.entry.data.category !== "success-story",
+  ? (await getBlogPosts()).filter((candidate) =>
+      isReleaseAnnouncementPost
+        ? candidate.entry.data.category === "release-announcements" ||
+          candidate.entry.data.categories.includes("release-announcements")
+        : isGeneralBlogPost(candidate),
     )
   : [];
 const blogSeriesIndex = post
@@ -274,10 +280,14 @@ const olderPost =
             <header class:list={["pb-8", !isMinimalArchive && "border-b"]}>
               {post ? (
                 <a
-                  href={withBasePath("/blog/")}
+                  href={withBasePath(
+                    isReleaseAnnouncementPost
+                      ? "/category/release-announcements/"
+                      : "/blog/",
+                  )}
                   class="text-sm font-medium text-brand no-underline underline-offset-4 hover:underline"
                 >
-                  &larr; Blog
+                  &larr; {isReleaseAnnouncementPost ? "Releases" : "Blog"}
                 </a>
               ) : (
                 pageData.eyebrow &&

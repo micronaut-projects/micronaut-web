@@ -17,6 +17,10 @@ import {
   saveGuideVariantPreference,
   type GuideVariantPreference,
 } from "@/lib/guide-variant-preference";
+import {
+  isProgrammingLanguage,
+  saveProgrammingLanguagePreference,
+} from "@/lib/programming-language-preference";
 
 export type GuideVariantLink = {
   id: string;
@@ -109,10 +113,15 @@ export function GuideVariantMenu({
                 variant.id === activeVariant?.id ? "page" : undefined
               }
               onClick={() =>
-                saveGuideVariantPreference({
-                  language: variant.language,
-                  buildTool: variant.buildTool,
-                })
+                (() => {
+                  saveGuideVariantPreference({
+                    language: variant.language,
+                    buildTool: variant.buildTool,
+                  });
+                  if (isProgrammingLanguage(variant.language)) {
+                    saveProgrammingLanguagePreference(variant.language);
+                  }
+                })()
               }
             >
               <span>{variant.languageLabel}</span>

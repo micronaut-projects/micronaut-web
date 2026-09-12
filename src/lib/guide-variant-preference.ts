@@ -1,3 +1,9 @@
+import { readProgrammingLanguageCookiePreference } from "@/lib/programming-language-preference";
+import {
+  readBuildToolCookiePreference,
+  saveBuildToolPreference,
+} from "@/lib/build-tool-preference";
+
 export type GuideVariantPreference = {
   language: string;
   buildTool: string;
@@ -25,18 +31,64 @@ export function isGuideVariantPreference(
   );
 }
 
+export function isGuideLanguage(
+  language: string,
+): language is "java" | "kotlin" | "groovy" {
+  return language === "java" || language === "kotlin" || language === "groovy";
+}
+
+export function isGuideBuildTool(
+  buildTool: string,
+): buildTool is "gradle" | "maven" {
+  return buildTool === "gradle" || buildTool === "maven";
+}
+
+export function normalizeGuidePreference(
+  preference: GuideVariantPreference,
+): GuideVariantPreference {
+  return {
+    language: isGuideLanguage(preference.language)
+      ? preference.language
+      : DEFAULT_GUIDE_VARIANT_PREFERENCE.language,
+    buildTool: isGuideBuildTool(preference.buildTool)
+      ? preference.buildTool
+      : DEFAULT_GUIDE_VARIANT_PREFERENCE.buildTool,
+  };
+}
+
 export function readGuideVariantPreference():
   GuideVariantPreference | undefined {
+  let stored: GuideVariantPreference | undefined;
   try {
-    const stored = localStorage.getItem(GUIDE_VARIANT_PREFERENCE_STORAGE_KEY);
-    if (!stored) {
-      return undefined;
+    const serialized = localStorage.getItem(
+      GUIDE_VARIANT_PREFERENCE_STORAGE_KEY,
+    );
+    if (serialized) {
+      const parsed: unknown = JSON.parse(serialized);
+      if (isGuideVariantPreference(parsed)) {
+        stored = parsed;
+      }
     }
-    const parsed: unknown = JSON.parse(stored);
-    return isGuideVariantPreference(parsed) ? parsed : undefined;
   } catch {
-    return undefined;
+    stored = undefined;
   }
+
+  const globalLanguage = readProgrammingLanguageCookiePreference();
+  const globalBuildTool = readBuildToolCookiePreference();
+
+  if (globalLanguage || globalBuildTool) {
+    return normalizeGuidePreference({
+      language:
+        globalLanguage ??
+        stored?.language ??
+        DEFAULT_GUIDE_VARIANT_PREFERENCE.language,
+      buildTool:
+        globalBuildTool ??
+        stored?.buildTool ??
+        DEFAULT_GUIDE_VARIANT_PREFERENCE.buildTool,
+    });
+  }
+  return stored ? normalizeGuidePreference(stored) : undefined;
 }
 
 export function saveGuideVariantPreference(preference: GuideVariantPreference) {
@@ -48,6 +100,11 @@ export function saveGuideVariantPreference(preference: GuideVariantPreference) {
   } catch {
     // The change event still updates the current page without storage.
   }
+
+  if (isGuideBuildTool(preference.buildTool)) {
+    saveBuildToolPreference(preference.buildTool);
+  }
+
   window.dispatchEvent(
     new CustomEvent<GuideVariantPreference>(GUIDE_VARIANT_PREFERENCE_EVENT, {
       detail: preference,

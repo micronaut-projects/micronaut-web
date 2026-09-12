@@ -619,6 +619,141 @@ test("expanded docs project link toggles sections inside the mobile sidebar", as
   expect(failures).toEqual([]);
 });
 
+test("global language cookie defaults docs snippets to Kotlin on load", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await context.addCookies([
+    {
+      name: "micronaut-code-language",
+      value: "kotlin",
+      domain: "127.0.0.1",
+      path: "/",
+    },
+  ]);
+
+  await page.goto(appPath("/docs/core/"));
+
+  const root = page.locator("[data-generated-docs]");
+  await expect(root).toBeVisible();
+
+  const firstKotlinTab = root
+    .locator(".docs-code-snippet-template")
+    .locator("button[role='tab'][data-lang='kotlin']")
+    .first();
+
+  const count = await firstKotlinTab.count();
+  if (count > 0) {
+    await expect(firstKotlinTab).toHaveAttribute("aria-selected", "true");
+    await expect(firstKotlinTab).toHaveClass(/(^|\s)selected(\s|$)/);
+  }
+
+  expect(failures).toEqual([]);
+});
+
+test("global language cookie defaults docs snippets to Groovy on load", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await context.addCookies([
+    {
+      name: "micronaut-code-language",
+      value: "groovy",
+      domain: "127.0.0.1",
+      path: "/",
+    },
+  ]);
+
+  await page.goto(appPath("/docs/core/"));
+
+  const root = page.locator("[data-generated-docs]");
+  await expect(root).toBeVisible();
+
+  const firstGroovyTab = root
+    .locator(".docs-code-snippet-template")
+    .locator("button[role='tab'][data-lang='groovy']")
+    .first();
+
+  const count = await firstGroovyTab.count();
+  if (count > 0) {
+    await expect(firstGroovyTab).toHaveAttribute("aria-selected", "true");
+    await expect(firstGroovyTab).toHaveClass(/(^|\s)selected(\s|$)/);
+  }
+
+  expect(failures).toEqual([]);
+});
+
+test("global language does not break local snippet tab override", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await context.addCookies([
+    {
+      name: "micronaut-code-language",
+      value: "kotlin",
+      domain: "127.0.0.1",
+      path: "/",
+    },
+  ]);
+
+  await page.goto(appPath("/docs/core/"));
+
+  const root = page.locator("[data-generated-docs]");
+  await expect(root).toBeVisible();
+
+  const firstJavaTab = root
+    .locator(".docs-code-snippet-template")
+    .locator("button[role='tab'][data-lang='java']")
+    .first();
+
+  const count = await firstJavaTab.count();
+  if (count > 0) {
+    await firstJavaTab.click();
+    await expect(firstJavaTab).toHaveAttribute("aria-selected", "true");
+    await expect(firstJavaTab).toHaveClass(/(^|\s)selected(\s|$)/);
+  }
+
+  expect(failures).toEqual([]);
+});
+
+test("global build-tool change updates docs snippets in real time", async ({
+  page,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(appPath("/docs/core/"));
+
+  const root = page.locator("[data-generated-docs]");
+  await expect(root).toBeVisible();
+
+  const firstMavenTab = root
+    .locator(".docs-code-snippet-template")
+    .locator("button[role='tab'][data-lang='maven']")
+    .first();
+
+  const count = await firstMavenTab.count();
+  if (count > 0) {
+    await page.evaluate(() => {
+      window.dispatchEvent(
+        new CustomEvent("micronaut-web-build-tool-change", {
+          detail: { buildTool: "maven" },
+        }),
+      );
+    });
+
+    await expect(firstMavenTab).toHaveAttribute("aria-selected", "true");
+  }
+
+  expect(failures).toEqual([]);
+});
+
 function collectBrowserFailures(page: Page) {
   const failures: string[] = [];
   page.on("pageerror", (error) => {

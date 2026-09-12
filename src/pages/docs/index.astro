@@ -1,6 +1,7 @@
 ---
 import WebLayout from "@/layouts/WebLayout.astro";
 import DocsShell from "@/components/web/docs-shell.astro";
+import { GuideVariantPreferencePicker } from "@/components/web/guide-variant-preference";
 import { ProjectCard } from "@/components/web/project-card";
 import {
   docsCatalogProjectsByCategory,
@@ -37,7 +38,16 @@ function gridClassFor(count: number) {
 >
   <DocsShell projectCatalog={docsProjectCatalog}>
     <section class="mx-auto grid w-full max-w-[1346px] gap-6 px-5 py-7 md:px-6">
-      <h1 class="sr-only">Micronaut Docs</h1>
+      <header>
+        <h1 class="max-w-3xl text-4xl font-bold tracking-tight md:text-5xl">
+          Micronaut Docs
+        </h1>
+        <div
+          class="mt-6 grid gap-3 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center"
+        >
+          <GuideVariantPreferencePicker client:load />
+        </div>
+      </header>
       <div class="grid gap-6">
         {
           categories.map((category) => {

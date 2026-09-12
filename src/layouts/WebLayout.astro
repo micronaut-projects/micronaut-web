@@ -214,6 +214,26 @@ const structuredData = {
         applyThemeMode(themeMode);
       })();
     </script>
+    <script is:inline>
+      (() => {
+        const cookies = document.cookie.split(";").map((value) => value.trim());
+        const langCookie = cookies.find((value) =>
+          value.startsWith("micronaut-code-language="),
+        );
+        const buildCookie = cookies.find((value) =>
+          value.startsWith("micronaut-build-tool="),
+        );
+        const language = langCookie?.slice("micronaut-code-language=".length);
+        const buildTool = buildCookie?.slice("micronaut-build-tool=".length);
+        if (
+          language === "kotlin" ||
+          language === "groovy" ||
+          buildTool === "maven"
+        ) {
+          document.documentElement.dataset.codeLanguagePending = "true";
+        }
+      })();
+    </script>
     <link
       rel="icon"
       href={withBasePath("/micronaut-assets/icons/micronaut-sally.svg")}

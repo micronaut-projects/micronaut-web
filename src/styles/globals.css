@@ -367,6 +367,12 @@
     @apply my-5 !flex !flex-col !gap-0 overflow-hidden rounded-xl border border-code-border !bg-code-tab !py-0 !text-code-foreground shadow-sm shadow-black/[0.03];
   }
 
+  html[data-code-language-pending="true"]
+    [data-generated-docs]
+    .docs-snippet-template {
+    visibility: hidden;
+  }
+
   .dark .docs-snippet-template {
     @apply shadow-black/20;
   }
