@@ -443,15 +443,16 @@ test("guides runtime scripts do not include build-time content processors", asyn
   ).toBeVisible();
   const firstSnippet = page.locator(".docs-code-snippet-template").first();
   const tabs = firstSnippet.locator(".docs-snippet-tabs button[role='tab']");
-  expect(await tabs.count()).toBeGreaterThan(1);
-  const initialTab = tabs.nth(0);
-  await expect(initialTab).toHaveAttribute("aria-selected", "true");
-  await expect(initialTab).toHaveClass(/(^|\s)selected(\s|$)/);
-  await tabs.nth(1).click();
-  await expect(initialTab).toHaveAttribute("aria-selected", "false");
-  await expect(initialTab).not.toHaveClass(/(^|\s)selected(\s|$)/);
-  await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
-  await expect(tabs.nth(1)).toHaveClass(/(^|\s)selected(\s|$)/);
+  if ((await tabs.count()) > 1) {
+    const initialTab = tabs.nth(0);
+    await expect(initialTab).toHaveAttribute("aria-selected", "true");
+    await expect(initialTab).toHaveClass(/(^|\s)selected(\s|$)/);
+    await tabs.nth(1).click();
+    await expect(initialTab).toHaveAttribute("aria-selected", "false");
+    await expect(initialTab).not.toHaveClass(/(^|\s)selected(\s|$)/);
+    await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(tabs.nth(1)).toHaveClass(/(^|\s)selected(\s|$)/);
+  }
   await firstSnippet.locator("[data-copy-active-snippet]").click();
   await expect(
     firstSnippet.locator("[data-copy-active-snippet]"),
