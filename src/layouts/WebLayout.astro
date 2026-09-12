@@ -124,6 +124,33 @@ const structuredData = {
     <meta name="color-scheme" content="light dark" />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={resolvedCanonicalUrl} />
+    {
+      surface === "main" && (
+        <>
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Micronaut Blog"
+            href={canonicalSurfaceUrl("main", "/rss.xml")}
+          />
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Micronaut Announcements"
+            href={canonicalSurfaceUrl("main", "/announcements/rss.xml")}
+          />
+          <link
+            rel="alternate"
+            type="application/rss+xml"
+            title="Micronaut Security Announcements"
+            href={canonicalSurfaceUrl(
+              "main",
+              "/security-announcements/rss.xml",
+            )}
+          />
+        </>
+      )
+    }
     <meta property="og:type" content={pageType} />
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:locale" content="en_US" />
