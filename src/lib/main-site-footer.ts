@@ -124,10 +124,10 @@ export const mainSiteFooterGroups: MainSiteFooterGroup[] = [
   {
     title: "RSS Feeds",
     links: [
-      { label: "Blog", href: "/rss.xml" },
-      { label: "Announcements", href: "/announcements/rss.xml" },
+      { label: "Blog RSS", href: "/rss.xml" },
+      { label: "Announcements RSS", href: "/announcements/rss.xml" },
       {
-        label: "Security Announcements",
+        label: "Security RSS",
         href: "/security-announcements/rss.xml",
       },
     ],
