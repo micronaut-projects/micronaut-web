@@ -39,7 +39,7 @@ export async function mainSiteRssResponse(feed: MainSiteFeed) {
     description: feed.description,
     site: canonicalSurfaceUrl("main", "/"),
     items,
-    customData: "<language>en-us</language>",
+    customData: "<language>en-US</language>",
   });
 }
 
