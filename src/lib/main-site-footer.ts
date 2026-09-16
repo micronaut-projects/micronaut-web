@@ -121,4 +121,15 @@ export const mainSiteFooterGroups: MainSiteFooterGroup[] = [
       { label: "Podcast", href: "https://micronautpodcast.com" },
     ],
   },
+  {
+    title: "RSS Feeds",
+    links: [
+      { label: "Blog RSS", href: "/rss.xml" },
+      { label: "Announcements RSS", href: "/announcements/rss.xml" },
+      {
+        label: "Security RSS",
+        href: "/security-announcements/rss.xml",
+      },
+    ],
+  },
 ];
