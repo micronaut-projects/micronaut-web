@@ -57,6 +57,16 @@ export type ResolvedLink = { href: string; label: string };
  * because this site took the host over.
  */
 export function projectApiBaseUri(context: ApiMacroContext): string {
+  const version = context.project?.version || "latest";
+  return `${projectPagesUri(context)}/${version}/api`;
+}
+
+/**
+ * The GitHub Pages site a project's build publishes its javadoc and
+ * `guide/configurationreference.html` to. Core's own `micronaut-core` site
+ * stopped at 3.4.0; the platform release publishes Core's to `micronaut-docs`.
+ */
+export function projectPagesUri(context: ApiMacroContext): string {
   const projectSlug =
     context.project?.slug || String(context.attributes?.projectSlug || "core");
   const repositoryName =
@@ -64,8 +74,7 @@ export function projectApiBaseUri(context: ApiMacroContext): string {
     context.project?.repositoryName === "micronaut-core"
       ? CORE_API_REPOSITORY
       : context.project?.repositoryName || `micronaut-${projectSlug}`;
-  const version = context.project?.version || "latest";
-  return `https://micronaut-projects.github.io/${repositoryName}/${version}/api`;
+  return `https://micronaut-projects.github.io/${repositoryName}`;
 }
 
 const CORE_API_REPOSITORY = "micronaut-docs";

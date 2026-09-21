@@ -83,6 +83,31 @@ try {
   generatedDocHtml = undefined;
 }
 
+/**
+ * Sections split out of this guide into another project (Core's HTTP chapters)
+ * are still linked here by their old bare ids, so the page names where each
+ * one went and the hash aligner forwards the reader.
+ */
+const movedSections = await Promise.all(
+  docsProjectCatalog.projects
+    .filter((candidate) => candidate.derivedFrom === project.slug)
+    .map(async (derived) => ({
+      href: withBasePath(`/docs/${derived.slug}/`),
+      ids: extractGeneratedDocSections(
+        await readFile(
+          join(
+            process.cwd(),
+            "src",
+            "content",
+            "generated-docs",
+            `${derived.slug}.html`,
+          ),
+          "utf8",
+        ).catch(() => ""),
+      ).map((section) => section.id.replace(`${derived.slug}-`, "")),
+    })),
+);
+
 const canonicalUrl = canonicalSurfaceUrl("docs", `/docs/${project.slug}/`);
 const generatedDocSections = generatedDocHtml
   ? extractGeneratedDocSections(generatedDocHtml)
@@ -261,6 +286,11 @@ const referenceLinks = projectReferenceLinks(project, {
               <div
                 class="generated-docs-content"
                 data-generated-docs={project.slug}
+                data-generated-docs-moved={
+                  movedSections.length
+                    ? JSON.stringify(movedSections)
+                    : undefined
+                }
                 set:html={generatedDocHtml}
               />
               <GeneratedDocsStaticEnhancer />

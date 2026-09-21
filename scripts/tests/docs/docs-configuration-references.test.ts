@@ -18,6 +18,7 @@ const page = [
   "<tr><td><p><code>fixture.early.enabled</code></p></td><td><p>boolean</p></td><td><p>Runs before any section heading.</p></td><td><p>true</p></td></tr>",
   "</tbody></table>",
   '<h3 id="a">Micronaut Fixture Config Properties</h3>',
+  '<a id="io.micronaut.fixture.FixtureConfiguration$Inner" href="#io.micronaut.fixture.FixtureConfiguration$Inner">&#128279;</a>',
   '<table class="tableblock">',
   '<caption class="title">Table 2. Configuration Properties for <a href="../api/io/micronaut/fixture/FixtureConfiguration.html">FixtureConfiguration</a></caption>',
   "<thead><tr><th>Property</th><th>Type</th><th>Description</th><th>Default value</th></tr></thead>",
@@ -62,6 +63,12 @@ test("parseConfigurationReference reads sections, owners, and rows", () => {
 
   // The unrelated table is dropped; the captioned one keeps its rows.
   assert.equal(main.tables.length, 1);
+  // Old links target a table by the anchor written ahead of it.
+  assert.equal(early.tables[0].id, undefined);
+  assert.equal(
+    main.tables[0].id,
+    "io.micronaut.fixture.FixtureConfiguration$Inner",
+  );
   const [name, count] = main.tables[0].rows;
   assert.deepEqual(name, {
     property: "fixture.name",

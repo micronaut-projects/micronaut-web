@@ -1,4 +1,4 @@
-import { projectApiBaseUri } from "../asciidoc/api-links.ts";
+import { projectApiBaseUri, projectPagesUri } from "../asciidoc/api-links.ts";
 import { decodeHtml } from "../shared/html.ts";
 import {
   configurationReferenceRows,
@@ -34,8 +34,8 @@ export interface ReferenceLinkProject {
 }
 
 /**
- * The published `configurationreference.html` always lives on the module's
- * own GitHub Pages site. Derived from the repository name rather than
+ * The published `configurationreference.html` lives next to the project's
+ * javadoc on its GitHub Pages site. Derived from the repository rather than
  * `publishedGuideUrl` because core's guide is served from docs.micronaut.io,
  * which does not carry the configuration reference (it 404s there).
  */
@@ -54,7 +54,7 @@ export function configurationReferenceUrl(
     return undefined;
   }
   if (project.repositoryName) {
-    return `https://micronaut-projects.github.io/${project.repositoryName}/latest/guide/configurationreference.html`;
+    return `${projectPagesUri({ project })}/latest/guide/configurationreference.html`;
   }
   return project.publishedGuideUrl
     ? new URL("configurationreference.html", project.publishedGuideUrl).href

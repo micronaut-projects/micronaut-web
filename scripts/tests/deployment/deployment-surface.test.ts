@@ -356,6 +356,20 @@ test("docs pruning publishes docs at the repository root", async (t) => {
   );
   assert.match(docsGuideRedirectHtml, /\/micronaut-docs\/latest\/core\//);
   assert.match(
+    await fs.readFile(
+      path.join(dist, "latest", "guide", "configurationreference.html"),
+      "utf8",
+    ),
+    /location\.replace\("\/micronaut-docs\/latest\/core\/configuration-reference\/"/,
+  );
+  // Core's javadoc left this host; the 404 page forwards `/{version}/api/`.
+  const notFoundHtml = await fs.readFile(path.join(dist, "404.html"), "utf8");
+  assert.match(notFoundHtml, /const base="\/micronaut-docs\/"/);
+  assert.match(
+    notFoundHtml,
+    /"https:\/\/micronaut-projects\.github\.io\/micronaut-docs"\+"\/"\+version\+"\/api\/"/,
+  );
+  assert.match(
     await fs.readFile(path.join(dist, "latest.html"), "utf8"),
     /location\.replace/,
   );

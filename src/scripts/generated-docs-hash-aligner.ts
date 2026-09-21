@@ -29,8 +29,28 @@ const hashTarget = (id: string) => {
   const prefixed = slug ? document.getElementById(`${slug}-${id}`) : null;
   if (prefixed) {
     window.history.replaceState(null, "", `#${prefixed.id}`);
+    return prefixed;
   }
-  return prefixed;
+  forwardMovedSection(id);
+  return null;
+};
+
+/**
+ * A section split out into another project (Core's HTTP chapters) is still
+ * linked on this page by its old id; send the reader to where it lives now.
+ */
+const forwardMovedSection = (id: string) => {
+  const moved = document
+    .querySelector(generatedDocsSelector)
+    ?.getAttribute("data-generated-docs-moved");
+  const destination =
+    moved &&
+    (JSON.parse(moved) as Array<{ href: string; ids: string[] }>).find(
+      (candidate) => candidate.ids.includes(id),
+    );
+  if (destination) {
+    window.location.replace(`${destination.href}#${encodeURIComponent(id)}`);
+  }
 };
 
 const alignGeneratedDocsHash = () => {

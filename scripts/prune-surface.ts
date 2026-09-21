@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { parseArgs, stringArg } from "./shared/cli.ts";
 import { copyCrawlerFiles } from "./shared/crawler-files.ts";
 import { hoistVersionedSurfaceAssets } from "./shared/surface-assets.ts";
+import { projectPagesUri } from "./asciidoc/api-links.ts";
 import { clientRedirectDocument } from "../src/lib/route-compatibility.ts";
 
 export type Surface = "main" | "docs" | "guides";
@@ -125,6 +126,24 @@ async function pruneDocs(
       path.join(temporaryDirectory, targetDirectory, "guide", "index.html"),
       withBase(base, joinUrlPath(root, "/core/")),
       "Micronaut Core docs",
+    );
+    // Module guides link Core's reference tables as
+    // `guide/configurationreference.html#<owner binary name>`; the per-module
+    // reference carries the same table anchors.
+    await writeRedirect(
+      path.join(
+        temporaryDirectory,
+        targetDirectory,
+        "guide",
+        "configurationreference.html",
+      ),
+      withBase(base, joinUrlPath(root, "/core/configuration-reference/")),
+      "the Micronaut Core configuration reference",
+    );
+    await fs.writeFile(
+      path.join(temporaryDirectory, "404.html"),
+      docsNotFoundDocument(withBase(base, "/")),
+      "utf8",
     );
     if (root !== "/") {
       await writeRedirect(
@@ -322,6 +341,41 @@ async function replaceDirectory(
     throw error;
   }
   await fs.rm(swap, { force: true, recursive: true });
+}
+
+/**
+ * GitHub Pages answers every missing path with the root `404.html`. This host
+ * used to carry Core's javadoc at `/{version}/api/`, and module guides still
+ * link it there; the javadoc is now published to Core's Pages site under the
+ * same `{version}/api/` layout, so those requests are forwarded to it.
+ */
+function docsNotFoundDocument(base: string): string {
+  const javadocSite = projectPagesUri({ project: { slug: "core" } });
+  return [
+    "<!doctype html>",
+    '<html lang="en">',
+    "<head>",
+    '<meta charset="utf-8" />',
+    '<meta name="viewport" content="width=device-width, initial-scale=1" />',
+    '<meta name="robots" content="noindex" />',
+    '<meta name="color-scheme" content="light dark" />',
+    "<style>",
+    "body{margin:0;display:grid;min-height:100vh;place-items:center;font:15px/1.5 system-ui,sans-serif;background:Canvas;color:CanvasText}",
+    "a{color:inherit}",
+    "</style>",
+    "<title>Page not found</title>",
+    "<script>",
+    `const base=${JSON.stringify(base)};`,
+    'const [version,api,...page]=location.pathname.startsWith(base)?location.pathname.slice(base.length).split("/"):[];',
+    `if(version&&api==="api"){location.replace(${JSON.stringify(javadocSite)}+"/"+version+"/api/"+page.join("/")+location.search+location.hash);}`,
+    "</script>",
+    "</head>",
+    "<body>",
+    `<p>This page does not exist. <a href="${base}">Browse the Micronaut docs</a></p>`,
+    "</body>",
+    "</html>",
+    "",
+  ].join("\n");
 }
 
 async function writeRedirect(

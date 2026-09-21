@@ -15,6 +15,7 @@ export interface ReferenceRow {
 }
 
 export interface ReferenceTable {
+  id?: string;
   owner?: string;
   ownerHref?: string;
   rows: ReferenceRow[];
@@ -123,7 +124,11 @@ const countLabel = `${propertyCount} properties across ${groups.length} ${
                 the widest property table stretched its cell past the track and
                 painted over the module rail. */}
             {group.tables.map((table) => (
-              <div class="min-w-0" data-docs-configuration-table>
+              <div
+                class="min-w-0 scroll-mt-24"
+                id={table.id}
+                data-docs-configuration-table
+              >
                 {table.owner && (
                   <p class="mb-1.5 text-sm text-muted-foreground">
                     Configuration properties for{" "}

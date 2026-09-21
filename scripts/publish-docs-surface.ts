@@ -118,6 +118,10 @@ export async function publishDocsSurface({
     path.join(publishedDirectory, "index.html"),
   );
   await copyIfExists(
+    path.join(distDirectory, "404.html"),
+    path.join(publishedDirectory, "404.html"),
+  );
+  await copyIfExists(
     path.join(distDirectory, "CNAME"),
     path.join(publishedDirectory, "CNAME"),
   );

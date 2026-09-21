@@ -15,6 +15,8 @@ export interface ConfigurationReferenceRow {
 }
 
 export interface ConfigurationReferenceTable {
+  /** The upstream table anchor, the owner's binary name old links target. */
+  id?: string;
   owner?: string;
   ownerHref?: string;
   rows: ConfigurationReferenceRow[];
@@ -56,9 +58,14 @@ export function parseConfigurationReference(
   const sections: ConfigurationReferenceSection[] = [];
   const claimedIds = new Set<string>();
   let current: ConfigurationReferenceSection | undefined;
+  let anchor: string | undefined;
   const partPattern =
-    /<h([23])[^>]*>([\s\S]*?)<\/h\1>|<table\b[\s\S]*?<\/table>/g;
+    /<h([23])[^>]*>([\s\S]*?)<\/h\1>|<a id="([^"]+)"|<table\b[\s\S]*?<\/table>/g;
   for (const match of html.matchAll(partPattern)) {
+    if (match[3]) {
+      anchor = match[3];
+      continue;
+    }
     if (match[1]) {
       const title = cleanSearchText(match[2]);
       if (!title) {
@@ -68,7 +75,8 @@ export function parseConfigurationReference(
       sections.push(current);
       continue;
     }
-    const table = parseConfigurationTable(match[0], baseUrl);
+    const table = parseConfigurationTable(match[0], baseUrl, anchor);
+    anchor = undefined;
     if (!table) {
       continue;
     }
@@ -88,6 +96,7 @@ export function parseConfigurationReference(
 function parseConfigurationTable(
   tableHtml: string,
   baseUrl: string,
+  id: string | undefined,
 ): ConfigurationReferenceTable | undefined {
   const caption = /<caption[^>]*>([\s\S]*?)<\/caption>/.exec(tableHtml)?.[1];
   if (caption && !/configuration properties/i.test(cleanSearchText(caption))) {
@@ -131,6 +140,7 @@ function parseConfigurationTable(
     return undefined;
   }
   return {
+    ...(id ? { id } : {}),
     ...(ownerLink
       ? {
           owner: cleanSearchText(ownerLink[2]),
