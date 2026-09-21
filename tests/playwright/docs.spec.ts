@@ -1176,3 +1176,11 @@ function normalizeRoot(path: string): string {
   }
   return absolutePath.endsWith("/") ? absolutePath : `${absolutePath}/`;
 }
+
+test("a Core link to a section split into HTTP opens the HTTP docs", async ({
+  page,
+}) => {
+  await page.goto(appPath("/docs/core/#httpServer"));
+  await expect(page).toHaveURL(/\/docs\/http\/#http-httpServer$/);
+  await expect(page.locator("#http-httpServer")).toBeInViewport();
+});

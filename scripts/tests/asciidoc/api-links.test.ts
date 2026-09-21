@@ -6,6 +6,7 @@ import {
   apiLink,
   packageLink,
   parseApiTarget,
+  projectPagesUri,
 } from "../../asciidoc/api-links.ts";
 
 const context = { project: { slug: "core" } };
@@ -210,6 +211,27 @@ describe("packageLink", () => {
         href: "https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/model/package-summary.html",
         label: "model package",
       },
+    );
+  });
+});
+
+describe("projectPagesUri", () => {
+  test("sends Core, and projects rendered out of its guide, to micronaut-docs", () => {
+    for (const project of [
+      { slug: "core" },
+      { slug: "http", repositoryName: "micronaut-core" },
+    ]) {
+      assert.equal(
+        projectPagesUri({ project }),
+        "https://micronaut-projects.github.io/micronaut-docs",
+      );
+    }
+  });
+
+  test("uses a module's repository even when no slug is known", () => {
+    assert.equal(
+      projectPagesUri({ project: { repositoryName: "micronaut-data" } }),
+      "https://micronaut-projects.github.io/micronaut-data",
     );
   });
 });

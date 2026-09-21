@@ -69,12 +69,13 @@ export function projectApiBaseUri(context: ApiMacroContext): string {
 export function projectPagesUri(context: ApiMacroContext): string {
   const projectSlug =
     context.project?.slug || String(context.attributes?.projectSlug || "core");
+  // The repository wins over the slug: a project known only by its
+  // repository must not fall back to the `core` default slug.
   const repositoryName =
-    projectSlug === "core" ||
-    context.project?.repositoryName === "micronaut-core"
-      ? CORE_API_REPOSITORY
-      : context.project?.repositoryName || `micronaut-${projectSlug}`;
-  return `https://micronaut-projects.github.io/${repositoryName}`;
+    context.project?.repositoryName || `micronaut-${projectSlug}`;
+  return `https://micronaut-projects.github.io/${
+    repositoryName === "micronaut-core" ? CORE_API_REPOSITORY : repositoryName
+  }`;
 }
 
 const CORE_API_REPOSITORY = "micronaut-docs";
