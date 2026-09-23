@@ -21,6 +21,10 @@ const intrinsicDimensions: Record<string, { width: number; height: number }> = {
     { width: 225, height: 87 },
   "/micronaut-assets/main-site/wp-content/uploads/2025/02/Sonar_Logo_Light-Backgrounds.svg":
     { width: 225, height: 87 },
+  "/micronaut-assets/main-site/wp-content/uploads/2025/02/oracle.svg": {
+    width: 710,
+    height: 410,
+  },
   "/micronaut-assets/home/minecraft.png": { width: 429, height: 185 },
   "/micronaut-assets/home/mojang.png": { width: 387, height: 185 },
   "/micronaut-assets/home/samsung-smart-things.png": {
