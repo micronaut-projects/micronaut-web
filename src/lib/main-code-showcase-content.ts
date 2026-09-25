@@ -47,7 +47,10 @@ function splitLeadingImports(code: string) {
   }
   return {
     importsCode: lines.slice(0, end).join("\n").trimEnd(),
-    bodyCode: lines.slice(end).join("\n").replace(/^\s*\n/, ""),
+    bodyCode: lines
+      .slice(end)
+      .join("\n")
+      .replace(/^\s*\n/, ""),
   };
 }
 
