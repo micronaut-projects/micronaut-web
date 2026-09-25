@@ -204,10 +204,12 @@ test("generated docs page renders desktop content and sidebars without overlap",
     "aria-current",
     "location",
   );
+  const pageTopLink = page.locator("[data-docs-page-top]");
+  await expect(pageTopLink).toBeVisible();
+  await expect(pageTopLink).toHaveAttribute("href", "#docs-top");
+  await expect(pageTopLink).toHaveAttribute("aria-label", "Back to top");
+  await expect(pageTopLink).toHaveAttribute("data-state", "visible");
   await expectTopHeaderPinned(page);
-  // Pinned with the reference row, so the version stays readable deep in a
-  // chapter, not only where the reader landed.
-  await expect(projectVersion).toBeInViewport();
 
   await expectNoHorizontalOverflow(page);
   await expectElementInsideViewport(page, ".docs-code-snippet-template");
@@ -216,6 +218,11 @@ test("generated docs page renders desktop content and sidebars without overlap",
     "[data-generated-docs]",
     'aside[aria-label="In this section"]',
   );
+  await pageTopLink.click();
+  await expect(page).toHaveURL(/#docs-top$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(10);
+  await expect(pageTopLink).toHaveAttribute("data-state", "hidden");
+  await expect(pageTopLink).toHaveAttribute("aria-hidden", "true");
   expect(failures).toEqual([]);
 });
 

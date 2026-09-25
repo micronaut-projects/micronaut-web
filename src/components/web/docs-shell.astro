@@ -1,6 +1,8 @@
 ---
+import { buttonVariants } from "@/components/ui/button";
 import DocsSidebarContent from "@/components/web/docs-sidebar-content.astro";
 import DocsScrollSpy from "@/components/web/docs-scroll-spy.astro";
+import { ArrowUp } from "lucide-react";
 import type { DocsProjectCatalog } from "@/lib/content-catalog";
 
 type ActiveSection = {
@@ -38,7 +40,7 @@ const sectionMenuHidden =
   currentSections.every((section) => section.parentId !== initialRootId);
 ---
 
-<div data-docs-shell class="min-h-[calc(100svh-3.5rem)]">
+<div id="docs-top" data-docs-shell class="min-h-[calc(100svh-3.5rem)]">
   <div class="flex min-h-0 flex-1">
     <aside
       data-docs-sidebar
@@ -171,6 +173,26 @@ const sectionMenuHidden =
         }
       </div>
       <slot />
+      <a
+        href="#docs-top"
+        class={buttonVariants({
+          variant: "outline",
+          size: "icon",
+          className:
+            "group fixed right-4 bottom-6 z-40 translate-y-2 border bg-background/95 opacity-0 shadow-md backdrop-blur transition-[transform,box-shadow,background-color,color,opacity] duration-200 pointer-events-none hover:bg-accent hover:text-accent-foreground data-[state=visible]:pointer-events-auto data-[state=visible]:translate-y-0 data-[state=visible]:opacity-100 active:scale-95 active:translate-y-0.5 active:shadow-sm md:right-8",
+        })}
+        aria-label="Back to top"
+        aria-hidden="true"
+        title="Back to top"
+        data-docs-page-top
+        data-state="hidden"
+        tabIndex={-1}
+      >
+        <ArrowUp
+          className="size-4 transition-transform duration-200 group-active:-translate-y-0.5"
+          aria-hidden="true"
+        />
+      </a>
     </main>
   </div>
   <DocsScrollSpy />
