@@ -5,7 +5,9 @@ import type { DefaultTreeAdapterMap } from "parse5";
 import { normalizePropertiesAssignmentHighlighting } from "./properties-highlight-normalization.ts";
 
 type HighlightableVariant = {
+  bodyCode?: string;
   code: string;
+  importsCode?: string;
   highlightedHtml?: string;
   highlighterLanguage?: string;
   language: string;
@@ -84,13 +86,24 @@ export async function highlightCodeSnippetVariants<
   T extends HighlightableVariant,
 >(variants: T[]) {
   return Promise.all(
-    variants.map(async (variant) => ({
-      ...variant,
-      highlightedHtml: await highlightCodeSnippetHtml(
-        variant.code,
-        variant.highlighterLanguage || variant.language,
-      ),
-    })),
+    variants.map(async (variant) => {
+      const language = variant.highlighterLanguage || variant.language;
+      return {
+        ...variant,
+        highlightedHtml: await highlightCodeSnippetHtml(
+          variant.bodyCode ?? variant.code,
+          language,
+        ),
+        ...(variant.importsCode
+          ? {
+              highlightedImportsHtml: await highlightCodeSnippetHtml(
+                variant.importsCode,
+                language,
+              ),
+            }
+          : {}),
+      };
+    }),
   );
 }
 
