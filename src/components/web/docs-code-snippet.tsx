@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import { type ReactNode, useRef, useState } from "react";
 
 import {
@@ -25,7 +26,12 @@ export type CodeSnippetLanguage =
 export type CodeSnippetVariant = {
   language: CodeSnippetLanguage;
   label: string;
+  /** Full sample; this is what the copy button copies. */
   code: string;
+  /** Leading import block, rendered folded above `bodyCode`. */
+  importsCode?: string;
+  bodyCode?: string;
+  highlightedImportsHtml?: string;
   active?: boolean;
   fileName?: string;
   highlightedHtml?: string;
@@ -42,6 +48,35 @@ export type CodeSnippetExample = {
   callouts?: ReactNode[];
   variants: CodeSnippetVariant[];
 };
+
+function FoldedImports({
+  code,
+  highlightedHtml,
+  language,
+}: {
+  code: string;
+  highlightedHtml?: string;
+  language: string;
+}) {
+  return (
+    <details className="group/imports bg-code [&_.docs-highlighted-pre]:!pt-1 [&_.docs-highlighted-pre]:!pb-0">
+      <summary className="group/fold flex w-fit cursor-pointer list-none items-center gap-2 px-6 pt-4 font-mono text-[0.85rem] leading-6 text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:text-foreground [&::-webkit-details-marker]:hidden">
+        <ChevronRight
+          aria-hidden="true"
+          className="size-3.5 shrink-0 transition-transform group-open/imports:rotate-90 motion-reduce:transition-none"
+        />
+        <span className="rounded border border-border bg-muted/50 px-1.5 leading-[1.35] transition-colors group-hover/fold:border-brand/60 group-focus-visible/fold:border-brand/60">
+          imports
+        </span>
+      </summary>
+      <HighlightedCodeBlock
+        code={code}
+        highlightedHtml={highlightedHtml}
+        language={language}
+      />
+    </details>
+  );
+}
 
 export function HighlightedCodeBlock({
   code,
@@ -287,8 +322,15 @@ export function DocsCodeSnippet({
             hidden={!active}
             className="docs-code-content docs-snippet-card-content"
           >
+            {variant.importsCode ? (
+              <FoldedImports
+                code={variant.importsCode}
+                highlightedHtml={variant.highlightedImportsHtml}
+                language={variant.language}
+              />
+            ) : null}
             <HighlightedCodeBlock
-              code={variant.code}
+              code={variant.bodyCode ?? variant.code}
               highlightedHtml={variant.highlightedHtml}
               language={variant.language}
             />
