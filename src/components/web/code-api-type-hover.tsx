@@ -10,6 +10,8 @@ import {
   importedTypes,
   javadocHref,
   javadocSummary,
+  qualifiedReference,
+  wildcardTypes,
 } from "@/lib/code-api-types";
 import type { ConfigurationPropertyHint } from "../../../scripts/docs/configuration-references.ts";
 
@@ -72,6 +74,40 @@ function typesOnPage() {
   return pageTypes;
 }
 
+/**
+ * A snippet's own imports win over the page's: Micronaut Data's docs import
+ * both `jakarta.persistence.Embeddable` and Micronaut's `Embeddable`.
+ */
+const snippetResolvers = new WeakMap<
+  HTMLElement,
+  (name: string) => string | undefined
+>();
+
+function resolverFor(code: HTMLElement) {
+  let resolve = snippetResolvers.get(code);
+  if (!resolve) {
+    // The folded imports are a code block of their own in the same panel.
+    const source =
+      (code.closest('[role="tabpanel"]') || code).textContent || "";
+    const types = importedTypes([source]);
+    const wildcard = wildcardTypes(source);
+    resolve = (name) =>
+      types.get(name) || typesOnPage().get(name) || wildcard(name);
+    snippetResolvers.set(code, resolve);
+  }
+  return resolve;
+}
+
+/** The dotted qualifiers written before a word: `Relation.` for `Kind`. */
+function qualifiersBefore(node: Node, offset: number, code: HTMLElement) {
+  const line = node.parentElement?.closest(".line") || code;
+  const before = document.createRange();
+  before.setStart(line, 0);
+  before.setEnd(node, offset);
+  const qualifiers = /(?:[A-Za-z_]\w*\.)+$/.exec(before.toString())?.[0];
+  return qualifiers ? qualifiers.slice(0, -1).split(".") : [];
+}
+
 type Properties = Record<string, ConfigurationPropertyHint>;
 
 /** The configuration key or imported type name under the pointer. */
@@ -107,7 +143,10 @@ function wordAt(
   if (!property) {
     [start, end] = around(/\w/);
     name = text.slice(start, end);
-    qualifiedName = typesOnPage().get(name);
+    qualifiedName = qualifiedReference(
+      [...qualifiersBefore(node, start, code), name],
+      resolverFor(code),
+    );
     href = qualifiedName && javadocHref(qualifiedName);
   }
   if (!qualifiedName || !href) {

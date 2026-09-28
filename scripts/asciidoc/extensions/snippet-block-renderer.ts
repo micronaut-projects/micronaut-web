@@ -12,6 +12,7 @@ import { build } from "esbuild";
 import type { BlockBuilder } from "./define.ts";
 import { docsSnippetLanguageLabel } from "../../../src/components/web/docs-snippet-icons.ts";
 import { highlightCodeSnippetHtml } from "../../../src/lib/docs-code-highlighting.ts";
+import { splitLeadingImports } from "../../../src/lib/leading-imports.ts";
 import { html } from "../../shared/html.ts";
 import {
   type CalloutItem,
@@ -57,6 +58,9 @@ type NormalizedSnippetSample = SnippetSample;
 type SnippetVariant = {
   active: boolean;
   highlightedHtml: string;
+  /** The leading package and imports, highlighted apart to render folded. */
+  highlightedImportsHtml?: string;
+  importsSource?: string;
   label: string;
   language: string;
   panelId: string;
@@ -230,13 +234,25 @@ export async function renderSnippetVariant({
   const displayLanguage = String(language || "text")
     .trim()
     .toLowerCase();
+  const highlighterLanguage = sample.highlighterLanguage || displayLanguage;
+  const { importsCode, bodyCode } = splitLeadingImports(sample.source || "");
   return {
     active,
     highlightedHtml: await highlightedCodeInnerHtml(
-      sample.source || "",
-      sample.highlighterLanguage || displayLanguage,
+      bodyCode ?? sample.source ?? "",
+      highlighterLanguage,
       displayLanguage,
     ),
+    ...(importsCode
+      ? {
+          highlightedImportsHtml: await highlightedCodeInnerHtml(
+            importsCode,
+            highlighterLanguage,
+            displayLanguage,
+          ),
+          importsSource: importsCode,
+        }
+      : {}),
     label: docsSnippetLanguageLabel(displayLanguage),
     language: displayLanguage,
     panelId,
