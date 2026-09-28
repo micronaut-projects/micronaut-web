@@ -7,6 +7,8 @@ type GeneratedSnippetKind = "code" | "dependency";
 type GeneratedSnippetVariant = {
   active: boolean;
   highlightedHtml: string;
+  highlightedImportsHtml?: string;
+  importsSource?: string;
   label: string;
   language: string;
   panelId: string;
@@ -47,6 +49,8 @@ export function renderGeneratedSnippet(input: GeneratedSnippetInput) {
           code: variant.source,
           fileName: variant.label,
           highlightedHtml: variant.highlightedHtml,
+          highlightedImportsHtml: variant.highlightedImportsHtml,
+          importsCode: variant.importsSource,
           label: variant.label,
           language: variant.language,
           panelId: variant.panelId,

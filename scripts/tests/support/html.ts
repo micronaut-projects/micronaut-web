@@ -38,12 +38,16 @@ export function snippetCards(html: string): SnippetCard[] {
       const panels = elements(card)
         .filter((element) => attribute(element, "role") === "tabpanel")
         .map((panel) => {
-          const code = elements(panel).find(
+          // Folded imports are a code block of their own ahead of the body.
+          const codes = elements(panel).filter(
             (element) => element.tagName === "code",
           );
           return {
-            language: (code && attribute(code, "data-lang")) || "",
-            code: code ? text(code).trimEnd() : "",
+            language: (codes[0] && attribute(codes[0], "data-lang")) || "",
+            code: codes
+              .map((code) => text(code).trimEnd())
+              .join("\n")
+              .trimEnd(),
           };
         });
       const activePanel = elements(card).find(
