@@ -171,48 +171,55 @@ const referenceLinks = projectReferenceLinks(project, {
       <div class:list={["min-w-0", !generatedDocHtml && "xl:px-14"]}>
         {
           /* The references sit where the reader starts, at the top of the
-             page, and from sm up they ride the scroll pinned under the
-             topbar, so every chapter is one click from the API and
-             configuration references. Phones keep the row in flow: pinned,
-             the pair wraps and would cover the prose it sits over. The
-             version rides along at the row's other end: which release of the
-             module a page documents was written down nowhere on it, and a
-             reader deep in a chapter needs it as much as one at the top. */
+             page. From sm up, once the reader scrolls past them, the row
+             docks in the bottom-right corner, so every chapter is one click
+             from the API and configuration references without the row
+             covering the prose under the topbar. The outer div keeps the
+             row's height in the flow so the page does not jump when it
+             docks. Phones keep the row in flow: docked, the pair wraps and
+             would cover the prose it sits over. The version rides along:
+             which release of the module a page documents was written down
+             nowhere on it, and a reader deep in a chapter needs it as much
+             as one at the top. */
         }
         <div
           data-docs-reference-links
-          class="group/references z-30 mb-6 flex flex-wrap items-center gap-2 sm:sticky sm:top-[calc(var(--topbar-height)+16px)] sm:mb-4"
+          class="group/references mb-6 sm:mb-4 sm:min-h-8"
         >
-          {
-            project.version && (
-              <span
-                data-docs-project-version
-                class="mr-auto rounded-md border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md"
-              >
-                {project.shortName} {project.version}
-              </span>
-            )
-          }
-          <nav
-            aria-label="Reference documentation"
-            class="flex flex-wrap gap-2 sm:justify-end"
+          <div
+            class="flex flex-wrap items-center gap-2 sm:group-data-[stuck=true]/references:fixed sm:group-data-[stuck=true]/references:right-4 sm:group-data-[stuck=true]/references:bottom-4 sm:group-data-[stuck=true]/references:z-30"
           >
             {
-              referenceLinks.map((reference) => (
-                <a
-                  href={reference.href}
-                  target={reference.external ? "_blank" : undefined}
-                  rel={reference.external ? "noreferrer" : undefined}
-                  class:list={[
-                    buttonVariants({ size: "sm", variant: "outline" }),
-                    "transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md",
-                  ]}
+              project.version && (
+                <span
+                  data-docs-project-version
+                  class="mr-auto rounded-md border bg-background sm:group-data-[stuck=true]/references:mr-0 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md"
                 >
-                  {reference.label}
-                </a>
-              ))
+                  {project.shortName} {project.version}
+                </span>
+              )
             }
-          </nav>
+            <nav
+              aria-label="Reference documentation"
+              class="flex flex-wrap gap-2 sm:justify-end"
+            >
+              {
+                referenceLinks.map((reference) => (
+                  <a
+                    href={reference.href}
+                    target={reference.external ? "_blank" : undefined}
+                    rel={reference.external ? "noreferrer" : undefined}
+                    class:list={[
+                      buttonVariants({ size: "sm", variant: "outline" }),
+                      "transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md",
+                    ]}
+                  >
+                    {reference.label}
+                  </a>
+                ))
+              }
+            </nav>
+          </div>
         </div>
         {
           !generatedDocHtml && (
