@@ -111,6 +111,10 @@ export function javadocHref(qualifiedName: string): string | undefined {
   if (segments[0] === "java" || segments[0] === "javax") {
     return `https://docs.oracle.com/en/java/javase/21/docs/api/search.html?q=${classPath}`;
   }
+  if (segments[0] === "jakarta") {
+    // The platform javadoc covers every spec: inject, validation, persistence.
+    return `https://jakarta.ee/specifications/platform/11/apidocs/${packagePath}/${classPath}.html${anchor}`;
+  }
   if (segments[0] === "reactor") {
     return `https://projectreactor.io/docs/core/release/api/${packagePath}/${classPath}.html${anchor}`;
   }
