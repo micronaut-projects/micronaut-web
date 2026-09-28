@@ -108,7 +108,7 @@ test("generated docs page renders desktop content and sidebars without overlap",
   await expect(page.locator(".docs-properties-template").first()).toBeVisible();
 
   // Which release of the module the page documents, named on the page itself.
-  const projectVersion = page.locator("[data-docs-project-version]");
+  const projectVersion = page.locator("[data-docs-project-version]:visible");
   await expect(projectVersion).toHaveText("Core 5.0.0");
 
   const docsSidebar = page.locator("[data-docs-sidebar]");
@@ -214,7 +214,7 @@ test("generated docs page renders desktop content and sidebars without overlap",
   await expectElementsDoNotOverlap(
     page,
     "[data-generated-docs]",
-    'aside[aria-label="In this section"]',
+    "[data-docs-current-section-index]",
   );
   expect(failures).toEqual([]);
 });
@@ -518,9 +518,7 @@ test("generated docs page fits the mobile viewport", async ({ page }) => {
   await expect(
     page.locator(".docs-code-snippet-template").first(),
   ).toBeVisible();
-  await expect(
-    page.locator('aside[aria-label="In this section"]'),
-  ).toBeHidden();
+  await expect(page.locator("[data-docs-current-section-index]")).toBeHidden();
 
   await expectNoHorizontalOverflow(page);
   await expectElementInsideViewport(page, ".docs-code-snippet-template");

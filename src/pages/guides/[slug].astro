@@ -26,10 +26,15 @@ import {
   type GeneratedGuide,
   type GeneratedGuideOption,
 } from "@/lib/generated-guides";
-import { withBasePath } from "@/lib/base-path";
+import { withBasePath, withSurfacePath } from "@/lib/base-path";
 import { clientRedirectDocument } from "@/lib/route-compatibility";
 import { shouldBuildGuidesRoutes } from "@/lib/surface-routes";
 import "@/styles/generated-docs-content.css";
+import {
+  mentionedConfigurationProperties,
+  type ConfigurationPropertyHint,
+} from "../../../scripts/docs/configuration-references.ts";
+import { readConfigurationReferences } from "../../../scripts/docs/configuration-references-store.ts";
 
 type TagProps = {
   kind: "tag";
@@ -129,6 +134,7 @@ const overviewDestination =
     : undefined;
 
 let fragmentHtml: string | undefined;
+let configurationProperties: Record<string, ConfigurationPropertyHint> = {};
 let sections: Array<{ id: string; label: string; depth: number }> = [];
 let pageIndexSections: Array<{
   id: string;
@@ -153,6 +159,15 @@ let currentGuideSectionLinks: Array<{
 }> = [];
 if (props.kind === "variant") {
   fragmentHtml = await readGeneratedGuideFragment(props.option);
+  configurationProperties = mentionedConfigurationProperties(
+    fragmentHtml || "",
+    await readConfigurationReferences(),
+    (slug, anchor) =>
+      withSurfacePath(
+        "docs",
+        `/docs/${slug}/configuration-reference/#${anchor}`,
+      ),
+  );
   sections = fragmentHtml ? extractSections(fragmentHtml) : [];
   pageIndexSections = buildGuidePageIndexSections(sections);
   guideSectionLinks = pageIndexSections
@@ -413,7 +428,10 @@ function buildGuidePageIndexSections(
                 set:html={fragmentHtml}
               />
               <GeneratedDocsStaticEnhancer />
-              <CodeApiTypeHover client:idle />
+              <CodeApiTypeHover
+                client:idle
+                properties={configurationProperties}
+              />
             </>
           ) : (
             <Card>

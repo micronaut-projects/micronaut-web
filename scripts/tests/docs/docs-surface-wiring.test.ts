@@ -509,11 +509,6 @@ test("docs routes render generated fragments and serve generated assets", async 
   assert.match(docsIndexSource, /loadDocsProjectCatalog/);
   assert.match(docsPageSource, /loadDocsProjectCatalog/);
   assert.match(searchIndexRouteSource, /loadDocsProjectCatalog/);
-  // The page names the module release it documents; the catalog carries it.
-  assert.match(
-    docsPageSource,
-    /data-docs-project-version[\s\S]*\{project\.shortName\} \{project\.version\}/,
-  );
   assert.match(docsSidebarContentSource, /category\.slug !== "most-popular"/);
   // The released deployment reads its published manifest; the snapshot hosts
   // no release line, so it names itself and asks for no manifest at all.
