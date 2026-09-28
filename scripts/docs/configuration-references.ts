@@ -239,8 +239,14 @@ export function mentionedConfigurationProperties(
   for (const [key] of html
     .replace(/<[^>]*>/g, " ")
     .matchAll(PROPERTY_KEY_PATTERN)) {
-    const hint =
-      exact.get(key) || patterns.find(([pattern]) => pattern.test(key))?.[1];
+    // A list entry, `mongodb.package-names[0]`, is documented as the list.
+    const hint = [key, key.replace(/(?:\[\d+\])+$/, "")]
+      .map(
+        (candidate) =>
+          exact.get(candidate) ||
+          patterns.find(([pattern]) => pattern.test(candidate))?.[1],
+      )
+      .find(Boolean);
     if (hint) {
       mentioned[key] = hint;
     }
