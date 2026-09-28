@@ -15,6 +15,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import DocsRelatedGuides from "@/components/web/docs-related-guides.astro";
 import DocsShell from "@/components/web/docs-shell.astro";
+import { CodeApiTypeHover } from "@/components/web/code-api-type-hover";
 import GeneratedDocsStaticEnhancer from "@/components/web/generated-docs-static-enhancer.astro";
 import { IconBadge } from "@/components/web/icon-badge";
 import { ProjectReferenceLinks } from "@/components/web/project-reference-links";
@@ -294,6 +295,7 @@ const referenceLinks = projectReferenceLinks(project, {
                 set:html={generatedDocHtml}
               />
               <GeneratedDocsStaticEnhancer />
+              <CodeApiTypeHover client:idle />
             </>
           ) : (
             <>

@@ -495,6 +495,13 @@
     @apply min-h-[1.5rem];
   }
 
+  /* Painted by code-api-type-hover.tsx over the type under the pointer. */
+  ::highlight(code-api-type) {
+    text-decoration: underline dotted;
+    text-underline-offset: 3px;
+    background-color: color-mix(in oklab, var(--primary) 18%, transparent);
+  }
+
   .docs-highlighted-code .conum {
     @apply ml-1 inline-flex h-[1.05rem] w-[1.05rem] items-center justify-center rounded-full bg-code-foreground text-[0.68rem] leading-none font-bold not-italic align-[0.08em] !text-code [font-family:var(--shell-font)];
     border: 1px solid
