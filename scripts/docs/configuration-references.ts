@@ -181,3 +181,69 @@ function sectionId(title: string, claimedIds: Set<string>): string {
   claimedIds.add(id);
   return id;
 }
+
+/** A documented property as the code hover shows it. */
+export interface ConfigurationPropertyHint {
+  property: string;
+  type: string;
+  description: string;
+  defaultValue: string;
+  href: string;
+}
+
+// Dotted keys as snippets write them: `micronaut.server.port`,
+// `datasources.default.url`, `micronaut.router.static-resources[0].paths`.
+const PROPERTY_KEY_PATTERN = /(?<![\w.-])[a-z][\w-]*(?:\.[\w-]+|\[\d+\])+/g;
+
+/**
+ * The documented properties a page's code mentions, keyed as written there,
+ * so the page carries hover text only for its own keys. A reference row's
+ * `*` stands for any one key segment and `[*]` for any list index.
+ */
+export function mentionedConfigurationProperties(
+  html: string,
+  references: ConfigurationReferences,
+  hrefFor: (slug: string, anchor: string) => string,
+): Record<string, ConfigurationPropertyHint> {
+  const exact = new Map<string, ConfigurationPropertyHint>();
+  const patterns: [RegExp, ConfigurationPropertyHint][] = [];
+  for (const [slug, reference] of Object.entries(references)) {
+    for (const section of reference.sections) {
+      for (const table of section.tables) {
+        for (const row of table.rows) {
+          const known = exact.get(row.property);
+          // The same key can be listed twice; keep the described one.
+          if (known?.description || (known && !row.description)) {
+            continue;
+          }
+          const hint = {
+            property: row.property,
+            type: row.type,
+            description: row.description,
+            defaultValue: row.defaultValue,
+            href: hrefFor(slug, table.id || section.id),
+          };
+          exact.set(row.property, hint);
+          if (row.property.includes("*")) {
+            const pattern = row.property
+              .replace(/[.[\]]/g, "\\$&")
+              .replace(/\\\[\*\\\]/g, "\\[\\d+\\]")
+              .replace(/\*/g, "[^.\\[]+");
+            patterns.push([new RegExp(`^${pattern}$`), hint]);
+          }
+        }
+      }
+    }
+  }
+  const mentioned: Record<string, ConfigurationPropertyHint> = {};
+  for (const [key] of html
+    .replace(/<[^>]*>/g, " ")
+    .matchAll(PROPERTY_KEY_PATTERN)) {
+    const hint =
+      exact.get(key) || patterns.find(([pattern]) => pattern.test(key))?.[1];
+    if (hint) {
+      mentioned[key] = hint;
+    }
+  }
+  return mentioned;
+}

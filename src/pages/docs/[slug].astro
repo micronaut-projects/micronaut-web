@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import DocsRelatedGuides from "@/components/web/docs-related-guides.astro";
+import DocsReferenceLinks from "@/components/web/docs-reference-links.astro";
 import DocsShell from "@/components/web/docs-shell.astro";
 import { CodeApiTypeHover } from "@/components/web/code-api-type-hover";
 import GeneratedDocsStaticEnhancer from "@/components/web/generated-docs-static-enhancer.astro";
@@ -34,6 +35,7 @@ import {
 } from "@/lib/generated-docs-html";
 import { shouldBuildDocsRoutes } from "@/lib/surface-routes";
 import { readConfigurationReferences } from "../../../scripts/docs/configuration-references-store.ts";
+import { mentionedConfigurationProperties } from "../../../scripts/docs/configuration-references.ts";
 import { projectReferenceLinks } from "../../../scripts/docs/search-index.ts";
 import "@/styles/generated-docs-content.css";
 
@@ -136,6 +138,14 @@ const relatedGuideTopicAliases = project.guideTopicAliases || [];
 const shouldRenderRelatedGuides = relatedGuideTopicAliases.length > 0;
 const guidesManifestUrl = withSurfacePath("guides", "/guides/manifest.json");
 const configurationReferences = await readConfigurationReferences();
+const configurationProperties = mentionedConfigurationProperties(
+  generatedDocHtml || "",
+  configurationReferences,
+  (slug, anchor) =>
+    withSurfacePath("docs", `/docs/${slug}/configuration-reference/#${anchor}`),
+);
+const projectVersionLabel =
+  project.version && `${project.shortName} ${project.version}`;
 const referenceLinks = projectReferenceLinks(project, {
   localConfigurationReference: Boolean(configurationReferences[project.slug]),
 }).map((reference) => ({
@@ -170,56 +180,26 @@ const referenceLinks = projectReferenceLinks(project, {
     >
       <div class:list={["min-w-0", !generatedDocHtml && "xl:px-14"]}>
         {
-          /* The references sit where the reader starts, at the top of the
-             page. From sm up, once the reader scrolls past them, the row
-             docks in the bottom-right corner, so every chapter is one click
-             from the API and configuration references without the row
-             covering the prose under the topbar. The outer div keeps the
-             row's height in the flow so the page does not jump when it
-             docks. Phones keep the row in flow: docked, the pair wraps and
-             would cover the prose it sits over. The version rides along:
-             which release of the module a page documents was written down
-             nowhere on it, and a reader deep in a chapter needs it as much
-             as one at the top. */
+          /* Below xl, where the section rail is hidden, the references sit
+             where the reader starts, at the top of the page. From sm up, once
+             the reader scrolls past them, the row docks in the bottom-right
+             corner, so every chapter is one click from the API and
+             configuration references without the row covering the prose
+             under the topbar. The outer div keeps the row's height in the
+             flow so the page does not jump when it docks. Phones keep the row
+             in flow: docked, the pair wraps and would cover the prose it sits
+             over. From xl up they stack at the foot of the section rail. The
+             version rides along: a reader deep in a chapter needs to know
+             which release of the module the page documents. */
         }
         <div
           data-docs-reference-links
-          class="group/references mb-6 sm:mb-4 sm:min-h-8"
+          class="group/references mb-6 sm:mb-4 sm:min-h-8 xl:hidden"
         >
-          <div
-            class="flex flex-wrap items-center gap-2 sm:group-data-[stuck=true]/references:fixed sm:group-data-[stuck=true]/references:right-4 sm:group-data-[stuck=true]/references:bottom-4 sm:group-data-[stuck=true]/references:z-30"
-          >
-            {
-              project.version && (
-                <span
-                  data-docs-project-version
-                  class="mr-auto rounded-md border bg-background sm:group-data-[stuck=true]/references:mr-0 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md"
-                >
-                  {project.shortName} {project.version}
-                </span>
-              )
-            }
-            <nav
-              aria-label="Reference documentation"
-              class="flex flex-wrap gap-2 sm:justify-end"
-            >
-              {
-                referenceLinks.map((reference) => (
-                  <a
-                    href={reference.href}
-                    target={reference.external ? "_blank" : undefined}
-                    rel={reference.external ? "noreferrer" : undefined}
-                    class:list={[
-                      buttonVariants({ size: "sm", variant: "outline" }),
-                      "transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md",
-                    ]}
-                  >
-                    {reference.label}
-                  </a>
-                ))
-              }
-            </nav>
-          </div>
+          <DocsReferenceLinks
+            version={projectVersionLabel}
+            links={referenceLinks}
+          />
         </div>
         {
           !generatedDocHtml && (
@@ -302,7 +282,10 @@ const referenceLinks = projectReferenceLinks(project, {
                 set:html={generatedDocHtml}
               />
               <GeneratedDocsStaticEnhancer />
-              <CodeApiTypeHover client:idle />
+              <CodeApiTypeHover
+                client:idle
+                properties={configurationProperties}
+              />
             </>
           ) : (
             <>
@@ -376,41 +359,56 @@ const referenceLinks = projectReferenceLinks(project, {
           nowhere to go. */
       }
       <div class="min-w-0">
-        {
-          currentSectionLinks.length > 0 && (
-            <aside
-              class="hidden h-full xl:block"
-              aria-label="In this section"
-              data-docs-current-section-index
-              hidden={initialCurrentSectionIndexHidden}
-            >
-              <div
-                class="sticky top-[calc(var(--topbar-height)+24px)] grid max-h-[calc(100vh-var(--topbar-height)-48px)] gap-1.5 overflow-y-auto pb-7 pl-2.5 pr-6 text-[0.82rem] [scrollbar-width:thin]"
-                data-docs-scroll-container
-              >
-                <h2 class="font-medium">In this section</h2>
-                <Separator className="opacity-70" />
-                {currentSectionLinks.map((section) => (
-                  <a
-                    href={`#${section.id}`}
-                    data-docs-current-section-link
-                    data-docs-scroll-link
-                    data-docs-section-root-id={section.parentId}
-                    hidden={section.parentId !== initialRootId}
-                    class:list={[
-                      "relative rounded-md py-1.5 pr-2 leading-5 break-words text-muted-foreground no-underline hover:bg-accent hover:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-foreground [&.active]:bg-accent [&.active]:font-medium [&.active]:text-foreground",
-                      section.indent <= 2 && "pl-2 text-[0.8rem]",
-                      section.indent === 3 && "pl-4 text-[0.78rem]",
-                      section.indent >= 4 && "pl-6 text-[0.76rem]",
-                    ]}
+        <aside class="hidden h-full xl:block">
+          {
+            /* The section list scrolls on its own, so a long one never pushes
+               the references off the bottom of the rail. */
+          }
+          <div
+            class="sticky top-[calc(var(--topbar-height)+24px)] flex max-h-[calc(100vh-var(--topbar-height)-48px)] flex-col gap-6 pb-7 pl-2.5 pr-6"
+          >
+            {
+              currentSectionLinks.length > 0 && (
+                <nav
+                  class="flex min-h-0 flex-col gap-1.5 text-[0.82rem]"
+                  aria-label="In this section"
+                  data-docs-current-section-index
+                  hidden={initialCurrentSectionIndexHidden}
+                >
+                  <h2 class="font-medium">In this section</h2>
+                  <Separator className="opacity-70" />
+                  <div
+                    class="grid min-h-0 gap-1.5 overflow-y-auto [scrollbar-width:thin]"
+                    data-docs-scroll-container
                   >
-                    {section.label}
-                  </a>
-                ))}
-              </div>
-            </aside>
-          )
-        }
+                    {currentSectionLinks.map((section) => (
+                      <a
+                        href={`#${section.id}`}
+                        data-docs-current-section-link
+                        data-docs-scroll-link
+                        data-docs-section-root-id={section.parentId}
+                        hidden={section.parentId !== initialRootId}
+                        class:list={[
+                          "relative rounded-md py-1.5 pr-2 leading-5 break-words text-muted-foreground no-underline hover:bg-accent hover:text-accent-foreground data-[active=true]:bg-accent data-[active=true]:font-medium data-[active=true]:text-foreground [&.active]:bg-accent [&.active]:font-medium [&.active]:text-foreground",
+                          section.indent <= 2 && "pl-2 text-[0.8rem]",
+                          section.indent === 3 && "pl-4 text-[0.78rem]",
+                          section.indent >= 4 && "pl-6 text-[0.76rem]",
+                        ]}
+                      >
+                        {section.label}
+                      </a>
+                    ))}
+                  </div>
+                </nav>
+              )
+            }
+            <DocsReferenceLinks
+              version={projectVersionLabel}
+              links={referenceLinks}
+              stacked
+            />
+          </div>
+        </aside>
       </div>
     </article>
   </DocsShell>

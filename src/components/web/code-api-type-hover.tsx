@@ -11,6 +11,7 @@ import {
   javadocHref,
   javadocSummary,
 } from "@/lib/code-api-types";
+import type { ConfigurationPropertyHint } from "../../../scripts/docs/configuration-references.ts";
 
 const CODE_SELECTOR = ".docs-highlighted-code";
 const HIGHLIGHT_NAME = "code-api-type";
@@ -20,8 +21,9 @@ const CLOSE_DELAY_MS = 250;
 type HoveredType = {
   name: string;
   qualifiedName: string;
-  href?: string;
+  href: string;
   rect: DOMRect;
+  property?: ConfigurationPropertyHint;
 };
 
 type WordAtPoint = HoveredType & { range: Range; code: HTMLElement };
@@ -31,12 +33,15 @@ const summaries = new Map<string, Promise<string | undefined>>();
 function summaryOf(href: string) {
   let summary = summaries.get(href);
   if (!summary) {
-    summary = href.startsWith("https://micronaut-projects.github.io/")
-      ? fetch(href)
-          .then((response) => (response.ok ? response.text() : ""))
-          .then((html) => (html ? javadocSummary(html) : undefined))
-          .catch(() => undefined)
-      : Promise.resolve(undefined);
+    // A member link would get its class's summary, so it gets none.
+    summary =
+      href.startsWith("https://micronaut-projects.github.io/") &&
+      !href.includes("#")
+        ? fetch(href)
+            .then((response) => (response.ok ? response.text() : ""))
+            .then((html) => (html ? javadocSummary(html) : undefined))
+            .catch(() => undefined)
+        : Promise.resolve(undefined);
     summaries.set(href, summary);
   }
   return summary;
@@ -67,7 +72,14 @@ function typesOnPage() {
   return pageTypes;
 }
 
-function wordAt(x: number, y: number): WordAtPoint | undefined {
+type Properties = Record<string, ConfigurationPropertyHint>;
+
+/** The configuration key or imported type name under the pointer. */
+function wordAt(
+  x: number,
+  y: number,
+  properties: Properties,
+): WordAtPoint | undefined {
   const caret = caretAt(x, y);
   const node = caret?.node;
   if (!node || node.nodeType !== Node.TEXT_NODE) {
@@ -78,13 +90,27 @@ function wordAt(x: number, y: number): WordAtPoint | undefined {
     return undefined;
   }
   const text = node.textContent || "";
-  let start = caret!.offset;
-  let end = caret!.offset;
-  while (start > 0 && /\w/.test(text[start - 1])) start -= 1;
-  while (end < text.length && /\w/.test(text[end])) end += 1;
-  const name = text.slice(start, end);
-  const qualifiedName = /^[A-Z]/.test(name) && typesOnPage().get(name);
-  if (!qualifiedName) {
+  const around = (pattern: RegExp) => {
+    let start = caret!.offset;
+    let end = caret!.offset;
+    while (start > 0 && pattern.test(text[start - 1])) start -= 1;
+    while (end < text.length && pattern.test(text[end])) end += 1;
+    return [start, end] as const;
+  };
+  let [start, end] = around(/[\w.\-[\]]/);
+  let name = text.slice(start, end);
+  const property = Object.hasOwn(properties, name)
+    ? properties[name]
+    : undefined;
+  let qualifiedName: string | undefined = property?.property;
+  let href: string | undefined = property?.href;
+  if (!property) {
+    [start, end] = around(/\w/);
+    name = text.slice(start, end);
+    qualifiedName = typesOnPage().get(name);
+    href = qualifiedName && javadocHref(qualifiedName);
+  }
+  if (!qualifiedName || !href) {
     return undefined;
   }
   const range = document.createRange();
@@ -98,10 +124,11 @@ function wordAt(x: number, y: number): WordAtPoint | undefined {
   return {
     name,
     qualifiedName,
-    href: javadocHref(qualifiedName),
+    href,
     rect,
     range,
     code,
+    property,
   };
 }
 
@@ -116,7 +143,12 @@ function paint(word: WordAtPoint | undefined) {
   }
 }
 
-export function CodeApiTypeHover() {
+export function CodeApiTypeHover({
+  properties = {},
+}: {
+  /** The documented configuration keys the page's snippets mention. */
+  properties?: Properties;
+}) {
   const [hovered, setHovered] = useState<HoveredType>();
   const [summary, setSummary] = useState<string>();
   const openTimer = useRef<number>(undefined);
@@ -156,7 +188,7 @@ export function CodeApiTypeHover() {
           leaveWord();
           return;
         }
-        const word = wordAt(clientX, clientY);
+        const word = wordAt(clientX, clientY, properties);
         if (
           word &&
           current.current?.range.startContainer === word.range.startContainer &&
@@ -183,7 +215,7 @@ export function CodeApiTypeHover() {
       if (!word || !document.getSelection()?.isCollapsed) {
         return;
       }
-      if ((event.metaKey || event.ctrlKey) && word.href) {
+      if (event.metaKey || event.ctrlKey) {
         event.preventDefault();
         window.open(word.href, "_blank", "noopener");
         return;
@@ -205,11 +237,11 @@ export function CodeApiTypeHover() {
       document.removeEventListener("click", onClick);
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [properties]);
 
   useEffect(() => {
     setSummary(undefined);
-    if (!hovered?.href) {
+    if (!hovered || hovered.property) {
       return;
     }
     let active = true;
@@ -261,20 +293,42 @@ export function CodeApiTypeHover() {
               {hovered.qualifiedName.replace(/^.*\./, "")}
             </span>
           </p>
-          {summary ? (
-            <p className="text-muted-foreground leading-snug">{summary}</p>
-          ) : null}
-          {hovered.href ? (
-            <a
-              href={hovered.href}
-              target="_blank"
-              rel="noopener"
-              className="text-primary inline-flex items-center gap-1 font-medium underline-offset-4 hover:underline"
-            >
-              Open Javadoc
-              <ExternalLink className="size-3.5" aria-hidden="true" />
-            </a>
-          ) : null}
+          {hovered.property ? (
+            <>
+              <p className="text-muted-foreground font-mono text-xs break-all">
+                {hovered.property.type}
+                {hovered.property.defaultValue
+                  ? ` = ${hovered.property.defaultValue}`
+                  : null}
+              </p>
+              {hovered.property.description ? (
+                <p className="text-muted-foreground leading-snug">
+                  {hovered.property.description}
+                </p>
+              ) : null}
+              <a
+                href={hovered.href}
+                className="text-primary inline-flex font-medium underline-offset-4 hover:underline"
+              >
+                Configuration reference
+              </a>
+            </>
+          ) : (
+            <>
+              {summary ? (
+                <p className="text-muted-foreground leading-snug">{summary}</p>
+              ) : null}
+              <a
+                href={hovered.href}
+                target="_blank"
+                rel="noopener"
+                className="text-primary inline-flex items-center gap-1 font-medium underline-offset-4 hover:underline"
+              >
+                Open Javadoc
+                <ExternalLink className="size-3.5" aria-hidden="true" />
+              </a>
+            </>
+          )}
         </PopoverContent>
       ) : null}
     </Popover>

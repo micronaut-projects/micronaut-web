@@ -2,7 +2,7 @@
 // imports the snippets already carry, so the pages need no per-token markup.
 
 const IMPORT_PATTERN =
-  /^[ \t]*import[ \t]+(?:static[ \t]+)?([A-Za-z_][\w.]*\.([A-Z]\w*))(?:[ \t]+as[ \t]+(\w+))?[ \t]*;?[ \t]*$/gm;
+  /^[ \t]*import[ \t]+(static[ \t]+)?([A-Za-z_][\w.]*)\.(\w+)(?:[ \t]+as[ \t]+(\w+))?[ \t]*;?[ \t]*$/gm;
 
 // Python: `from micronaut.http.client import HttpClient, HttpRequest as Req`,
 // optionally parenthesised across lines.
@@ -18,10 +18,15 @@ export function importedTypes(sources: Iterable<string>) {
     }
   };
   for (const source of sources) {
-    for (const [, qualifiedName, simpleName, alias] of source.matchAll(
+    for (const [, isStatic, owner, simpleName, alias] of source.matchAll(
       IMPORT_PATTERN,
     )) {
-      add(alias || simpleName, qualifiedName);
+      // A static import names a member: `MediaType.TEXT_PLAIN`, `assertEquals`.
+      if (isStatic) {
+        add(alias || simpleName, `${owner}#${simpleName}`);
+      } else if (/^[A-Z]/.test(simpleName)) {
+        add(alias || simpleName, `${owner}.${simpleName}`);
+      }
     }
     for (const [, module, names] of source.matchAll(PYTHON_IMPORT_PATTERN)) {
       // Micronaut's Python modules mirror the Java packages under `io.`.
@@ -75,27 +80,44 @@ const MODULE_REPOSITORIES: Record<string, string> = {
   serde: "micronaut-serialization",
 };
 
-/** The javadoc page of a class, or undefined when no known site hosts it. */
+// Packages of the documentation's own example code, which has no javadoc.
+const EXAMPLE_PACKAGES = new Set(["docs", "example", "examples"]);
+
+/**
+ * The javadoc page of a class, or of a `Class#member`, or undefined when no
+ * known site hosts it.
+ */
 export function javadocHref(qualifiedName: string): string | undefined {
-  const segments = qualifiedName.split(".");
+  const [typeName, member] = qualifiedName.split("#");
+  const segments = typeName.split(".");
   const packageIndex = segments.findIndex((segment) => /^[A-Z]/.test(segment));
-  if (packageIndex <= 0) {
+  const packages = segments.slice(0, packageIndex);
+  if (
+    packageIndex <= 0 ||
+    packages.some((segment) => EXAMPLE_PACKAGES.has(segment))
+  ) {
     return undefined;
   }
-  const packagePath = segments.slice(0, packageIndex).join("/");
+  const packagePath = packages.join("/");
   const classPath = segments.slice(packageIndex).join(".");
+  const anchor = member ? `#${member}` : "";
   if (segments[0] === "io" && segments[1] === "micronaut") {
     const module = segments[2];
     const repository = CORE_PACKAGES.has(module)
       ? "micronaut-docs"
       : MODULE_REPOSITORIES[module] || `micronaut-${module}`;
-    return `${PAGES}/${repository}/latest/api/${packagePath}/${classPath}.html`;
+    return `${PAGES}/${repository}/latest/api/${packagePath}/${classPath}.html${anchor}`;
   }
   if (segments[0] === "java" || segments[0] === "javax") {
     return `https://docs.oracle.com/en/java/javase/21/docs/api/search.html?q=${classPath}`;
   }
   if (segments[0] === "reactor") {
-    return `https://projectreactor.io/docs/core/release/api/${packagePath}/${classPath}.html`;
+    return `https://projectreactor.io/docs/core/release/api/${packagePath}/${classPath}.html${anchor}`;
+  }
+  if (segments[0] === "org" && segments[1] === "junit") {
+    // JUnit's javadoc is split by module, named after its first packages.
+    const module = packages.slice(0, 4).join(".");
+    return `https://docs.junit.org/current/api/${module}/${packagePath}/${classPath}.html${anchor}`;
   }
   return undefined;
 }
