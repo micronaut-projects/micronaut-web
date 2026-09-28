@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { CodeApiTypeHover } from "@/components/web/code-api-type-hover";
 import GeneratedDocsStaticEnhancer from "@/components/web/generated-docs-static-enhancer.astro";
 import LatestGuidesCatalog from "@/components/web/latest-guides-catalog.astro";
 import { GuideVariantPreferencePicker } from "@/components/web/guide-variant-preference";
@@ -412,6 +413,7 @@ function buildGuidePageIndexSections(
                 set:html={fragmentHtml}
               />
               <GeneratedDocsStaticEnhancer />
+              <CodeApiTypeHover client:idle />
             </>
           ) : (
             <Card>

@@ -138,6 +138,21 @@ diffLink::[]
 
 == Snippet Macros
 
+.Python client with imports
+[source,python]
+----
+from micronaut.http import HttpRequest
+from micronaut.http.client import (
+    HttpClient,
+    BlockingHttpClient as Blocking,
+)
+
+
+def fetch(client: HttpClient) -> str:
+    blocking: Blocking = client.toBlocking()
+    return blocking.retrieve(HttpRequest.GET("/hello"))
+----
+
 source::GalleryController[]
 callout::gallery-source[]
 
