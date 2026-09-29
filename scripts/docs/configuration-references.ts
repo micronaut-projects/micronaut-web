@@ -1,3 +1,4 @@
+import { kebabCase } from "../../src/lib/configuration-key-path.ts";
 import { cleanSearchText } from "./search-index.ts";
 
 /**
@@ -239,8 +240,10 @@ export function mentionedConfigurationProperties(
   for (const [key] of html
     .replace(/<[^>]*>/g, " ")
     .matchAll(PROPERTY_KEY_PATTERN)) {
-    // A list entry, `mongodb.package-names[0]`, is documented as the list.
-    const hint = [key, key.replace(/(?:\[\d+\])+$/, "")]
+    // A list entry, `mongodb.package-names[0]`, is documented as the list,
+    // and a camelCase key, `nThreads`, as its kebab-case form, `n-threads`.
+    const list = key.replace(/(?:\[\d+\])+$/, "");
+    const hint = [key, list, kebabCase(key), kebabCase(list)]
       .map(
         (candidate) =>
           exact.get(candidate) ||

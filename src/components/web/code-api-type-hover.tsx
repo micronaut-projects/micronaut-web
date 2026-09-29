@@ -13,6 +13,11 @@ import {
   qualifiedReference,
   wildcardTypes,
 } from "@/lib/code-api-types";
+import {
+  configurationKeyPath,
+  isNestedConfigurationLanguage,
+  kebabCase,
+} from "@/lib/configuration-key-path";
 import type { ConfigurationPropertyHint } from "../../../scripts/docs/configuration-references.ts";
 
 const CODE_SELECTOR = ".docs-highlighted-code";
@@ -108,6 +113,23 @@ function qualifiersBefore(node: Node, offset: number, code: HTMLElement) {
   return qualifiers ? qualifiers.slice(0, -1).split(".") : [];
 }
 
+/** The snippet's text before or after an offset in one of its text nodes. */
+function textAround(
+  code: HTMLElement,
+  node: Node,
+  offset: number,
+  side: "before" | "after",
+) {
+  const range = document.createRange();
+  range.selectNodeContents(code);
+  if (side === "before") {
+    range.setEnd(node, offset);
+  } else {
+    range.setStart(node, offset);
+  }
+  return range.toString();
+}
+
 type Properties = Record<string, ConfigurationPropertyHint>;
 
 /** The configuration key or imported type name under the pointer. */
@@ -135,9 +157,28 @@ function wordAt(
   };
   let [start, end] = around(/[\w.\-[\]]/);
   let name = text.slice(start, end);
-  const property = Object.hasOwn(properties, name)
-    ? properties[name]
-    : undefined;
+  let property = Object.hasOwn(properties, name) ? properties[name] : undefined;
+  if (!property && isNestedConfigurationLanguage(code.dataset.lang)) {
+    [start, end] = around(/[\w.-]/);
+    name = text.slice(start, end);
+    const key =
+      name &&
+      configurationKeyPath(
+        code.dataset.lang!,
+        textAround(code, node, start, "before"),
+        name,
+        textAround(code, node, end, "after"),
+      );
+    // Groovy configuration spells the keys the Properties tab kebab-cases.
+    const found =
+      key &&
+      [key, kebabCase(key)].find((candidate) =>
+        Object.hasOwn(properties, candidate),
+      );
+    if (found) {
+      property = properties[found];
+    }
+  }
   let qualifiedName: string | undefined = property?.property;
   let href: string | undefined = property?.href;
   if (!property) {
