@@ -144,8 +144,6 @@ const configurationProperties = mentionedConfigurationProperties(
   (slug, anchor) =>
     withSurfacePath("docs", `/docs/${slug}/configuration-reference/#${anchor}`),
 );
-const projectVersionLabel =
-  project.version && `${project.shortName} ${project.version}`;
 const referenceLinks = projectReferenceLinks(project, {
   localConfigurationReference: Boolean(configurationReferences[project.slug]),
 }).map((reference) => ({
@@ -197,7 +195,8 @@ const referenceLinks = projectReferenceLinks(project, {
           class="group/references mb-6 sm:mb-4 sm:min-h-8 xl:hidden"
         >
           <DocsReferenceLinks
-            version={projectVersionLabel}
+            project={project.shortName}
+            version={project.version}
             links={referenceLinks}
           />
         </div>
@@ -361,11 +360,13 @@ const referenceLinks = projectReferenceLinks(project, {
       <div class="min-w-0">
         <aside class="hidden h-full xl:block">
           {
-            /* The section list scrolls on its own, so a long one never pushes
-               the references off the bottom of the rail. */
+            /* The rail fills the viewport under the topbar and the references
+               sit at its foot, level with the docs sidebar's footer. The
+               section list scrolls on its own, so a long one never pushes the
+               references off the bottom of the rail. */
           }
           <div
-            class="sticky top-[calc(var(--topbar-height)+24px)] flex max-h-[calc(100vh-var(--topbar-height)-48px)] flex-col gap-6 pb-7 pl-2.5 pr-6"
+            class="sticky top-[calc(var(--topbar-height)+24px)] flex h-[calc(100svh-var(--topbar-height)-32px)] flex-col gap-6 pl-2.5 pr-6"
           >
             {
               currentSectionLinks.length > 0 && (
@@ -403,7 +404,8 @@ const referenceLinks = projectReferenceLinks(project, {
               )
             }
             <DocsReferenceLinks
-              version={projectVersionLabel}
+              project={project.shortName}
+            version={project.version}
               links={referenceLinks}
               stacked
             />
