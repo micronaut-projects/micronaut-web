@@ -258,7 +258,8 @@ const structuredData = {
           language === "groovy" ||
           buildTool === "maven" ||
           query.has("lang") ||
-          query.has("build")
+          query.has("build") ||
+          query.has("config-format")
         ) {
           document.documentElement.dataset.codeLanguagePending = "true";
         }

@@ -236,13 +236,14 @@ import { readCodePreferenceQuery } from "@/lib/code-preference-query";
         stabilizeGeneratedImages(root);
         enhanceTemplateSnippetControls(root);
       });
-    // Apply the saved preferences, then `?lang=`/`?build=`, to all snippets.
+    // Apply the saved preferences, then the URL query, to all snippets.
     const query = readCodePreferenceQuery();
     for (const preference of [
       readProgrammingLanguageCookiePreference(),
       readBuildToolCookiePreference(),
       query.language,
       query.buildTool,
+      query.configFormat,
     ]) {
       if (preference) {
         applyGlobalLanguagePreference(preference);
