@@ -4,6 +4,12 @@ import {
   readProgrammingLanguageCookiePreference,
   saveProgrammingLanguagePreference,
 } from "@/lib/programming-language-preference";
+import {
+  isBuildTool,
+  readBuildToolCookiePreference,
+  saveBuildToolPreference,
+} from "@/lib/build-tool-preference";
+import { readCodePreferenceQuery } from "@/lib/code-preference-query";
 
 (() => {
   const snippetText = (block: Element) => {
@@ -112,12 +118,8 @@ import {
         const language = tabs[nextIndex]?.dataset.lang;
         if (isProgrammingLanguage(language)) {
           saveProgrammingLanguagePreference(language);
-        } else if (language === "gradle" || language === "maven") {
-          import("@/lib/build-tool-preference")
-            .then(({ saveBuildToolPreference }) => {
-              saveBuildToolPreference(language as any);
-            })
-            .catch(() => {});
+        } else if (isBuildTool(language)) {
+          saveBuildToolPreference(language);
         }
       }
     };
@@ -234,19 +236,18 @@ import {
         stabilizeGeneratedImages(root);
         enhanceTemplateSnippetControls(root);
       });
-    // Apply global language preference to all snippets.
-    const preferredLanguage = readProgrammingLanguageCookiePreference();
-    if (preferredLanguage) {
-      applyGlobalLanguagePreference(preferredLanguage);
+    // Apply the saved preferences, then `?lang=`/`?build=`, to all snippets.
+    const query = readCodePreferenceQuery();
+    for (const preference of [
+      readProgrammingLanguageCookiePreference(),
+      readBuildToolCookiePreference(),
+      query.language,
+      query.buildTool,
+    ]) {
+      if (preference) {
+        applyGlobalLanguagePreference(preference);
+      }
     }
-    import("@/lib/build-tool-preference")
-      .then(({ readBuildToolCookiePreference }) => {
-        const preferredBuildTool = readBuildToolCookiePreference();
-        if (preferredBuildTool) {
-          applyGlobalLanguagePreference(preferredBuildTool);
-        }
-      })
-      .catch(() => {});
     document.documentElement.removeAttribute("data-code-language-pending");
   };
 

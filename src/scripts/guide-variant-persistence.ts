@@ -1,4 +1,6 @@
+import { readCodePreferenceQuery } from "@/lib/code-preference-query";
 import {
+  matchGuideVariant,
   normalizeGuidePreference,
   readGuideVariantPreference,
   saveGuideVariantPreference,
@@ -9,6 +11,29 @@ import {
   saveProgrammingLanguagePreference,
   type ProgrammingLanguage,
 } from "@/lib/programming-language-preference";
+
+// `?lang=`/`?build=` open the matching variant of this guide, keeping the
+// query so the link still says what it asked for.
+const query = readCodePreferenceQuery();
+if (query.language || query.buildTool) {
+  const variants = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>(
+      "a[data-guide-variant-language][data-guide-variant-build-tool]",
+    ),
+    (link) => ({
+      link,
+      language: link.dataset.guideVariantLanguage || "",
+      buildTool: link.dataset.guideVariantBuildTool || "",
+    }),
+  );
+  const preference = readGuideVariantPreference();
+  const match = preference && matchGuideVariant(variants, preference);
+  if (match && match.link.getAttribute("aria-current") !== "page") {
+    window.location.replace(
+      match.link.pathname + window.location.search + window.location.hash,
+    );
+  }
+}
 
 // Choosing a variant from the guide reader's "Different variants" list stores
 // the same preference the guides index uses for its "Read" links.

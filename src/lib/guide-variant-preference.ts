@@ -3,6 +3,7 @@ import {
   readBuildToolCookiePreference,
   saveBuildToolPreference,
 } from "@/lib/build-tool-preference";
+import { readCodePreferenceQuery } from "@/lib/code-preference-query";
 
 export type GuideVariantPreference = {
   language: string;
@@ -58,6 +59,26 @@ export function normalizeGuidePreference(
 
 export function readGuideVariantPreference():
   GuideVariantPreference | undefined {
+  // `?lang=python&build=pyronaut` is not normalized: a Python guide variant
+  // exists even though the saved preference only knows the JVM languages.
+  const query = readCodePreferenceQuery();
+  if (query.language || query.buildTool) {
+    const saved = readSavedGuideVariantPreference();
+    return {
+      language:
+        query.language ??
+        saved?.language ??
+        DEFAULT_GUIDE_VARIANT_PREFERENCE.language,
+      buildTool:
+        query.buildTool ??
+        saved?.buildTool ??
+        DEFAULT_GUIDE_VARIANT_PREFERENCE.buildTool,
+    };
+  }
+  return readSavedGuideVariantPreference();
+}
+
+function readSavedGuideVariantPreference(): GuideVariantPreference | undefined {
   let stored: GuideVariantPreference | undefined;
   try {
     const serialized = localStorage.getItem(
