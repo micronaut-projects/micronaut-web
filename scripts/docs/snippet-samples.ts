@@ -66,7 +66,9 @@ export function docsSnippetSamples(
           source,
           macroAttribute(attrs, "tags") || macroAttribute(attrs, "tag") || "",
         );
-        if (taggedSource.diagnostics.length) {
+        // Upstream sometimes asks for a tag one language's file lacks, such as
+        // `imports`; the tags that did resolve still make a useful snippet.
+        if (taggedSource.diagnostics.length && !taggedSource.source.trim()) {
           samples.push({
             language,
             source: `NOTE: ${taggedSourceDiagnosticMessage(

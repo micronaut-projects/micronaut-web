@@ -169,11 +169,12 @@ function wordAt(
         name,
         textAround(code, node, end, "after"),
       );
-    // Groovy configuration spells the keys the Properties tab kebab-cases.
+    // Groovy configuration spells the keys the Properties tab kebab-cases,
+    // and a list key, `addresses:`, is shipped as its first entry.
     const found =
       key &&
-      [key, kebabCase(key)].find((candidate) =>
-        Object.hasOwn(properties, candidate),
+      [key, kebabCase(key), `${key}[0]`, `${kebabCase(key)}[0]`].find(
+        (candidate) => Object.hasOwn(properties, candidate),
       );
     if (found) {
       property = properties[found];
