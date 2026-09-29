@@ -685,6 +685,30 @@ test("global language cookie defaults docs snippets to Groovy on load", async ({
   expect(failures).toEqual([]);
 });
 
+test("lang and build query parameters select docs snippet tabs without saving them", async ({
+  page,
+  context,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.goto(appPath("/docs/core/?lang=groovy&build=maven"));
+
+  const templates = page.locator(
+    "[data-generated-docs] .docs-snippet-template",
+  );
+  for (const language of ["groovy", "maven"]) {
+    await expect(
+      templates.locator(`button[role='tab'][data-lang='${language}']`).first(),
+    ).toHaveAttribute("aria-selected", "true");
+  }
+  expect(
+    (await context.cookies()).filter((cookie) =>
+      ["micronaut-code-language", "micronaut-build-tool"].includes(cookie.name),
+    ),
+  ).toEqual([]);
+  expect(failures).toEqual([]);
+});
+
 test("global language does not break local snippet tab override", async ({
   page,
   context,

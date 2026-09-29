@@ -252,10 +252,13 @@ const structuredData = {
         );
         const language = langCookie?.slice("micronaut-code-language=".length);
         const buildTool = buildCookie?.slice("micronaut-build-tool=".length);
+        const query = new URLSearchParams(location.search);
         if (
           language === "kotlin" ||
           language === "groovy" ||
-          buildTool === "maven"
+          buildTool === "maven" ||
+          query.has("lang") ||
+          query.has("build")
         ) {
           document.documentElement.dataset.codeLanguagePending = "true";
         }

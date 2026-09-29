@@ -426,6 +426,28 @@ test("guide overview redirects to the preferred variant and exposes variant navi
   expect(failures).toEqual([]);
 });
 
+test("lang and build query parameters open the matching guide variant", async ({
+  page,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.goto(
+    appPath(
+      isGuidesSurface()
+        ? "/guides/micronaut-http-client-gradle-java/?lang=groovy&build=maven"
+        : "/guides/micronaut-http-client.html?lang=groovy&build=maven",
+    ),
+  );
+
+  await expect(page).toHaveURL(
+    guideUrlPattern(
+      "micronaut-http-client-maven-groovy",
+      "lang=groovy&build=maven",
+    ),
+  );
+  expect(failures).toEqual([]);
+});
+
 test("guides runtime scripts do not include build-time content processors", async ({
   page,
 }) => {
