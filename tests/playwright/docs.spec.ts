@@ -109,7 +109,7 @@ test("generated docs page renders desktop content and sidebars without overlap",
 
   // Which release of the module the page documents, named on the page itself.
   const projectVersion = page.locator("[data-docs-project-version]:visible");
-  await expect(projectVersion).toHaveText("Core 5.0.0");
+  await expect(projectVersion).toHaveText("Core v5.0.0");
 
   const docsSidebar = page.locator("[data-docs-sidebar]");
   await expect(docsSidebar).toBeVisible();

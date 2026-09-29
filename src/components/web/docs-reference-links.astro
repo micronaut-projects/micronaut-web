@@ -1,62 +1,101 @@
 ---
+import { ArrowUpRight, Code2, SlidersHorizontal } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface Props {
+  project: string;
   version?: string;
   links: { label: string; href: string; external: boolean }[];
   /** Stacked in the section rail rather than laid out as the top row. */
   stacked?: boolean;
 }
 
-const { version, links, stacked = false } = Astro.props;
+const { project, version, links, stacked = false } = Astro.props;
+const icons: Record<string, typeof Code2> = {
+  "API Reference": Code2,
+  "Configuration Reference": SlidersHorizontal,
+};
 ---
 
-<div
-  class:list={[
-    "flex gap-2",
-    stacked
-      ? "flex-col items-stretch"
-      : "flex-wrap items-center sm:group-data-[stuck=true]/references:fixed sm:group-data-[stuck=true]/references:right-4 sm:group-data-[stuck=true]/references:bottom-4 sm:group-data-[stuck=true]/references:z-30",
-  ]}
->
-  {
-    version && (
-      <span
-        data-docs-project-version
-        class:list={[
-          "rounded-md border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground",
-          stacked
-            ? "self-start"
-            : "mr-auto transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md sm:group-data-[stuck=true]/references:mr-0",
-        ]}
+{
+  stacked ? (
+    <section class="mt-auto flex shrink-0 flex-col gap-1.5 text-[0.82rem]">
+      <h2
+        data-docs-project-version={version ? "" : undefined}
+        class="flex items-center justify-between gap-2 font-medium"
       >
-        {version}
-      </span>
-    )
-  }
-  <nav
-    aria-label="Reference documentation"
-    class:list={[
-      "flex gap-2",
-      stacked ? "flex-col" : "flex-wrap sm:justify-end",
-    ]}
-  >
-    {
-      links.map((reference) => (
-        <a
-          href={reference.href}
-          target={reference.external ? "_blank" : undefined}
-          rel={reference.external ? "noreferrer" : undefined}
-          class:list={[
-            buttonVariants({ size: "sm", variant: "outline" }),
-            stacked
-              ? "justify-start"
-              : "transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md",
-          ]}
+        <span class="truncate">{project}</span>{" "}
+        {version && (
+          <Badge variant="secondary" className="font-mono text-[0.7rem]">
+            v{version}
+          </Badge>
+        )}
+      </h2>
+      <Separator className="opacity-70" />
+      <nav aria-label="Reference documentation" class="grid gap-0.5">
+        {links.map((reference) => {
+          const Icon = icons[reference.label] || Code2;
+          return (
+            <a
+              href={reference.href}
+              target={reference.external ? "_blank" : undefined}
+              rel={reference.external ? "noreferrer" : undefined}
+              class="group/reference flex items-center gap-2 rounded-md px-2 py-1.5 leading-5 text-muted-foreground no-underline hover:bg-accent hover:text-accent-foreground"
+            >
+              <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+              <span class="min-w-0 flex-1 truncate">{reference.label}</span>
+              {reference.external && (
+                <ArrowUpRight
+                  className="size-3.5 shrink-0 opacity-50 transition group-hover/reference:translate-x-0.5 group-hover/reference:-translate-y-0.5 group-hover/reference:opacity-100"
+                  aria-hidden="true"
+                />
+              )}
+              {reference.external && (
+                <span class="sr-only">(opens in a new tab)</span>
+              )}
+            </a>
+          );
+        })}
+      </nav>
+    </section>
+  ) : (
+    <div class="flex flex-wrap items-center gap-2 sm:group-data-[stuck=true]/references:fixed sm:group-data-[stuck=true]/references:right-4 sm:group-data-[stuck=true]/references:bottom-4 sm:group-data-[stuck=true]/references:z-30">
+      {version && (
+        <span
+          data-docs-project-version
+          class="mr-auto inline-flex h-8 items-center gap-1.5 rounded-md border bg-background px-2.5 text-xs font-medium transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md sm:group-data-[stuck=true]/references:mr-0"
         >
-          {reference.label}
-        </a>
-      ))
-    }
-  </nav>
-</div>
+          {project}{" "}
+          <span class="font-mono text-muted-foreground">v{version}</span>
+        </span>
+      )}
+      <nav
+        aria-label="Reference documentation"
+        class="flex flex-wrap gap-2 sm:justify-end"
+      >
+        {links.map((reference) => {
+          const Icon = icons[reference.label] || Code2;
+          return (
+            <a
+              href={reference.href}
+              target={reference.external ? "_blank" : undefined}
+              rel={reference.external ? "noreferrer" : undefined}
+              class:list={[
+                buttonVariants({ size: "sm", variant: "outline" }),
+                "transition-shadow duration-300 ease-out group-data-[stuck=true]/references:shadow-md",
+              ]}
+            >
+              <Icon aria-hidden="true" />
+              {reference.label}
+              {reference.external && (
+                <ArrowUpRight className="opacity-50" aria-hidden="true" />
+              )}
+            </a>
+          );
+        })}
+      </nav>
+    </div>
+  )
+}
