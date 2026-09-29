@@ -709,6 +709,25 @@ test("lang and build query parameters select docs snippet tabs without saving th
   expect(failures).toEqual([]);
 });
 
+test("config-format query parameter selects configuration tabs only", async ({
+  page,
+}) => {
+  const failures = collectBrowserFailures(page);
+
+  await page.goto(appPath("/docs/core/?config-format=groovy"));
+
+  // Groovy configuration is selected, while code examples stay on Java.
+  const tab = (language: string) =>
+    page
+      .locator(
+        `[data-generated-docs] .docs-snippet-template button[role='tab'][data-lang='${language}']`,
+      )
+      .first();
+  await expect(tab("groovy-config")).toHaveAttribute("aria-selected", "true");
+  await expect(tab("java")).toHaveAttribute("aria-selected", "true");
+  expect(failures).toEqual([]);
+});
+
 test("global language does not break local snippet tab override", async ({
   page,
   context,
