@@ -98,6 +98,14 @@ describe("docsSnippetSamples", () => {
         },
       ],
     );
+    assert.deepEqual(
+      docsSnippetSamples(
+        "example.Tagged",
+        { tags: "missing,present" },
+        context,
+      ),
+      [{ language: "java", source: "class Tagged {}" }],
+    );
   });
 
   test("renders one sample per language from project-base directories, skipping duplicates", async (t) => {
