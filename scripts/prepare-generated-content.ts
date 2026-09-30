@@ -8,15 +8,23 @@ const projectDirectory = path.resolve(
 );
 
 type GeneratedContentTask = readonly [
-  label: "docs" | "guides",
+  label: string,
+  surfaces: Array<"docs" | "guides">,
   command: string,
   args: string[],
 ];
 
+// Guide pages show the configuration references in their snippet hovers, so
+// both surfaces collect them.
 const tasks: GeneratedContentTask[] = [
-  ["docs", process.execPath, ["scripts/render-docs.ts"]],
-  ["docs", process.execPath, ["scripts/fetch-configuration-references.ts"]],
-  ["guides", process.execPath, ["scripts/render-guides.ts"]],
+  ["docs", ["docs"], process.execPath, ["scripts/render-docs.ts"]],
+  [
+    "configuration references",
+    ["docs", "guides"],
+    process.execPath,
+    ["scripts/fetch-configuration-references.ts"],
+  ],
+  ["guides", ["guides"], process.execPath, ["scripts/render-guides.ts"]],
 ];
 
 const selectedTasks = tasksForDeploymentSurface();
@@ -25,7 +33,7 @@ if (selectedTasks.length === 0) {
   console.log("Skipping generated docs and guides content preparation.");
 } else {
   await Promise.all(
-    selectedTasks.map(([label, command, args]) => run(label, command, args)),
+    selectedTasks.map(([label, , command, args]) => run(label, command, args)),
   );
 }
 
@@ -62,7 +70,7 @@ function tasksForDeploymentSurface(): GeneratedContentTask[] {
   }
   const surface = process.env.MICRONAUT_DEPLOY_SURFACE;
   if (surface === "docs" || surface === "guides") {
-    return tasks.filter(([label]) => label === surface);
+    return tasks.filter(([, surfaces]) => surfaces.includes(surface));
   }
   if (surface === "main") {
     return [];

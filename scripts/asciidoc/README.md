@@ -82,7 +82,8 @@ The guide registry registers:
 - `registerGuidePreprocessor(...)`, which replaces guide placeholders, appends
   the license include, rewrites include targets, expands `common::`,
   `external::`, the `-template` variants and `callout::` in place, rewrites
-  legacy exclude directives such as `:exclude-for-languages:groovy` into
+  legacy exclude directives such as `:exclude-for-languages:groovy` and its
+  inverse `:only-for-languages:java,kotlin` into
   `ifeval::[]`/`endif::[]` conditionals, and wraps `:dependencies:` groups in
   a `[guide-dependencies]` open block whose body lists the `dependency::`
   macros. The in-place expansions must happen before parsing because the

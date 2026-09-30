@@ -93,7 +93,32 @@ async function guideRenderContext({
     guide,
     option,
     version: await readVersion(guidesDirectory),
+    dependencyVersions: await readDependencyVersions(guidesDirectory),
   };
+}
+
+// The guides build resolves `@<artifactId>Version@` from the dependencies
+// declared in its own `buildSrc` pom.
+async function readDependencyVersions(
+  guidesDirectory: string,
+): Promise<Record<string, string>> {
+  let pom: string;
+  try {
+    pom = await fs.readFile(
+      path.join(guidesDirectory, "buildSrc/src/main/resources/pom.xml"),
+      "utf8",
+    );
+  } catch {
+    return {};
+  }
+  return Object.fromEntries(
+    Array.from(
+      pom.matchAll(
+        /<dependency>[^]*?<artifactId>([^<]+)<\/artifactId>\s*<version>([^<]+)<\/version>[^]*?<\/dependency>/g,
+      ),
+      (match) => [match[1].trim(), match[2].trim()],
+    ),
+  );
 }
 
 async function readVersion(guidesDirectory: string): Promise<string> {
