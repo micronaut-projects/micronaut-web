@@ -82,7 +82,7 @@ describe("the guide macro gallery", () => {
     assert.doesNotMatch(text, /should not render/);
     assert.doesNotMatch(
       html,
-      /source:{1,2}|test:{1,2}|rawTest:{1,2}|resource:{1,2}|testResource:{1,2}|zipInclude:{1,2}|common-template:{1,2}|external-template:{1,2}|rocker:{1,2}|diffLink:{1,2}|callout:{1,2}|exclude-for-languages:{1,2}|exclude-for-build:{1,2}|exclude-for-jdk-lower-than:{1,2}/,
+      /source:{1,2}|test:{1,2}|rawTest:{1,2}|resource:{1,2}|testResource:{1,2}|zipInclude:{1,2}|common-template:{1,2}|external-template:{1,2}|rocker:{1,2}|diffLink:{1,2}|callout:{1,2}|exclude-for-languages:{1,2}|only-for-languages:{1,2}|exclude-for-build:{1,2}|exclude-for-jdk-lower-than:{1,2}/,
     );
   });
 });
@@ -96,6 +96,15 @@ describe("content macro expansion", () => {
       "Cycle start. Skipped recursive include common-gallery-cycle.adoc.",
     );
   });
+});
+
+test("dependency version placeholders resolve from the guides pom", async () => {
+  assert.equal(
+    textOnly(
+      await renderGuide("Awaitility @awaitilityVersion@, @unknownVersion@."),
+    ),
+    "Awaitility 4.3.0, @unknownVersion@.",
+  );
 });
 
 describe("legacy exclude directives", () => {
@@ -155,6 +164,39 @@ describe("legacy exclude directives", () => {
         "Gradle excluded text.",
         "Always visible text.",
       ],
+    );
+  });
+
+  test("show only-for-languages content for the listed languages", async () => {
+    const only = [
+      ":only-for-languages:groovy",
+      "Groovy only text.",
+      ":only-for-languages:",
+      ":only-for-languages:java,kotlin",
+      "Java and Kotlin only text.",
+      ":only-for-languages:",
+      ":only-for-languages:java",
+      ":only-for-languages:groovy",
+      "Adjacent Java and Groovy only text.",
+      ":only-for-languages:",
+      "Always visible text.",
+    ].join("\n");
+    const render = async (language: string): Promise<string> =>
+      textOnly(
+        await renderGuide(only, { option: { buildTool: "gradle", language } }),
+      );
+
+    assert.equal(
+      await render("java"),
+      "Java and Kotlin only text. Adjacent Java and Groovy only text. Always visible text.",
+    );
+    assert.equal(
+      await render("groovy"),
+      "Groovy only text. Adjacent Java and Groovy only text. Always visible text.",
+    );
+    assert.equal(
+      await render("kotlin"),
+      "Java and Kotlin only text. Always visible text.",
     );
   });
 

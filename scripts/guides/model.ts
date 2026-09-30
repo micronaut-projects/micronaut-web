@@ -53,6 +53,8 @@ export interface GuideRenderContext {
   guide: Guide;
   option: GuideOption;
   version: string;
+  // Versions by artifact id, substituted for `@<artifactId>Version@`.
+  dependencyVersions: Record<string, string>;
 }
 
 export const DEFAULT_GUIDE_SLUGS = [

@@ -23,7 +23,7 @@ import {
 export const GUIDE_DEPENDENCIES_BLOCK = "guide-dependencies";
 const CALLOUT_LINE_MACRO = /^callout:{1,2}([^\[]+)\[([^\]]*)]\s*$/;
 const EXCLUDE_DIRECTIVE_LINE =
-  /^:(exclude-for-languages|exclude-for-build|exclude-for-jdk-lower-than):(.*)$/;
+  /^:(exclude-for-languages|only-for-languages|exclude-for-build|exclude-for-jdk-lower-than):(.*)$/;
 const DEFAULT_MIN_JDK = 21;
 const LICENSE_INCLUDE = "common::license.adoc[]";
 const EXPANDED_CONTENT_MACRO_LINE =
@@ -46,7 +46,10 @@ const LEGACY_LINE_BLOCK_MACROS = new Set([
 ]);
 
 type ExcludeMacroName =
-  "exclude-for-languages" | "exclude-for-build" | "exclude-for-jdk-lower-than";
+  | "exclude-for-languages"
+  | "only-for-languages"
+  | "exclude-for-build"
+  | "exclude-for-jdk-lower-than";
 
 type ExcludeDirective = {
   name: ExcludeMacroName;
@@ -167,7 +170,9 @@ function rewriteGuideLines(
 
 // Legacy exclude directives are rewritten to Asciidoctor's own conditionals:
 // `:exclude-for-languages:groovy,kotlin` opens one `ifeval` per value (all
-// must hold for the body to render) and the bare directive closes them. The
+// must hold for the body to render) and the bare directive closes them.
+// `:only-for-languages:java,kotlin` is the inverse and opens a single
+// `ifeval` that holds when the rendered language is one of the values. The
 // rules that guide sources rely on are kept: directives written on adjacent
 // lines merge into one group, a closing directive with no open group is a
 // no-op, closing an outer group also closes groups nested inside it, and a
@@ -185,9 +190,12 @@ class ExcludeConditionals {
     if (!values.length) {
       return this.close(directive.name);
     }
-    const conditions = values
-      .map((value) => this.condition(directive.name, value))
-      .filter((condition): condition is string => Boolean(condition));
+    const conditions =
+      directive.name === "only-for-languages"
+        ? [this.onlyForLanguagesCondition(values)]
+        : values
+            .map((value) => this.condition(directive.name, value))
+            .filter((condition): condition is string => Boolean(condition));
     this.open.push({ name: directive.name, count: conditions.length });
     // Asciidoctor drops the directive lines without separating blocks, so a
     // blank line keeps the body from joining the paragraph before it.
@@ -212,6 +220,17 @@ class ExcludeConditionals {
       lines.push(...endifLines(this.open.pop()!.count));
     }
     return [...lines, ""];
+  }
+
+  // `ifeval` has no "or", so the match is decided here and written as a
+  // comparison against the matching value, or against the whole list if none.
+  private onlyForLanguagesCondition(values: string[]): string {
+    const language = this.context.option.language.toLowerCase();
+    const languages = values.map((value) => value.toLowerCase());
+    const expected = languages.includes(language)
+      ? language
+      : languages.join(",");
+    return `"${language}" == "${expected}"`;
   }
 
   private condition(name: ExcludeMacroName, value: string): string | undefined {
@@ -453,6 +472,11 @@ function replacePlaceholders(
       String(context.guide.minimumJavaVersion || DEFAULT_MIN_JDK),
     )
     .replaceAll("@api@", coreApiBaseUri);
+  for (const [artifactId, version] of Object.entries(
+    context.dependencyVersions,
+  )) {
+    text = text.replaceAll(`@${artifactId}Version@`, version);
+  }
 
   text = rewriteIncludeTargets(text, context);
   text = text.replace(

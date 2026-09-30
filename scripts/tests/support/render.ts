@@ -144,6 +144,7 @@ export function guideFixtureContext(): GuideRenderContext {
       zipUrl: "snippet-gallery-gradle-java.zip",
     },
     version: "4.9.0",
+    dependencyVersions: { awaitility: "4.3.0" },
   };
 }
 
