@@ -185,7 +185,7 @@ export function GuideVariantPreferencePicker({
   return (
     <div
       className={cn(
-        "flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 sm:flex-nowrap",
+        "flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2",
         !hydrated && "invisible",
       )}
     >
