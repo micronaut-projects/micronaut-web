@@ -10,6 +10,11 @@ import {
   saveBuildToolPreference,
 } from "@/lib/build-tool-preference";
 import { readCodePreferenceQuery } from "@/lib/code-preference-query";
+import {
+  CONFIG_FORMAT_EVENT,
+  isConfigFormat,
+  readConfigFormatCookiePreference,
+} from "@/lib/config-format-preference";
 
 (() => {
   const snippetText = (block: Element) => {
@@ -217,6 +222,13 @@ import { readCodePreferenceQuery } from "@/lib/code-preference-query";
     }
   });
 
+  window.addEventListener(CONFIG_FORMAT_EVENT, (event) => {
+    const detail = (event as CustomEvent<{ configFormat?: string }>).detail;
+    if (isConfigFormat(detail?.configFormat)) {
+      applyGlobalLanguagePreference(detail.configFormat);
+    }
+  });
+
   window.addEventListener("micronaut-web-build-tool-change", (event) => {
     const detail = (event as CustomEvent<{ buildTool?: string }>).detail;
     const buildTool = detail?.buildTool;
@@ -241,6 +253,7 @@ import { readCodePreferenceQuery } from "@/lib/code-preference-query";
     for (const preference of [
       readProgrammingLanguageCookiePreference(),
       readBuildToolCookiePreference(),
+      readConfigFormatCookiePreference(),
       query.language,
       query.buildTool,
       query.configFormat,

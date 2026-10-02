@@ -257,6 +257,9 @@ const structuredData = {
           language === "kotlin" ||
           language === "groovy" ||
           buildTool === "maven" ||
+          /(^|;\s*)micronaut-config-format=(?!properties)/.test(
+            document.cookie,
+          ) ||
           query.has("lang") ||
           query.has("build") ||
           query.has("config-format")
