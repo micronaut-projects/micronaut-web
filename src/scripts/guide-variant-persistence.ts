@@ -82,6 +82,10 @@ window.addEventListener("micronaut-web-build-tool-change", (event) => {
     return;
   }
   const existing = readGuideVariantPreference();
+  // Saving a guide preference saves its build tool too, which fires this event.
+  if (existing?.buildTool === detail.buildTool) {
+    return;
+  }
   const currentLanguage = existing?.language ?? "java";
   saveGuideVariantPreference(
     normalizeGuidePreference({

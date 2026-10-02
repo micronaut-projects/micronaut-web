@@ -76,14 +76,7 @@ export function GuideVariantPreferencePicker({
     // becomes the saved preference, so it is still selected without the query.
     const query = readCodePreferenceQuery();
     if (stored && (query.language || query.buildTool)) {
-      const next = normalizeGuidePreference(stored);
-      saveGuideVariantPreference(next);
-      if (isProgrammingLanguage(next.language)) {
-        saveProgrammingLanguagePreference(next.language);
-      }
-      if (isBuildTool(next.buildTool)) {
-        saveBuildToolPreference(next.buildTool);
-      }
+      saveGuideVariantPreference(normalizeGuidePreference(stored));
     }
     if (isConfigFormat(query.configFormat)) {
       saveConfigFormatPreference(query.configFormat);
