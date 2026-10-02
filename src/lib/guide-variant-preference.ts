@@ -1,5 +1,6 @@
 import { readProgrammingLanguageCookiePreference } from "@/lib/programming-language-preference";
 import {
+  isBuildTool,
   readBuildToolCookiePreference,
   saveBuildToolPreference,
 } from "@/lib/build-tool-preference";
@@ -34,14 +35,21 @@ export function isGuideVariantPreference(
 
 export function isGuideLanguage(
   language: string,
-): language is "java" | "kotlin" | "groovy" {
-  return language === "java" || language === "kotlin" || language === "groovy";
+): language is "java" | "kotlin" | "groovy" | "python" {
+  return (
+    language === "java" ||
+    language === "kotlin" ||
+    language === "groovy" ||
+    language === "python"
+  );
 }
 
 export function isGuideBuildTool(
   buildTool: string,
-): buildTool is "gradle" | "maven" {
-  return buildTool === "gradle" || buildTool === "maven";
+): buildTool is "gradle" | "maven" | "pyronaut" {
+  return (
+    buildTool === "gradle" || buildTool === "maven" || buildTool === "pyronaut"
+  );
 }
 
 export function normalizeGuidePreference(
@@ -59,8 +67,6 @@ export function normalizeGuidePreference(
 
 export function readGuideVariantPreference():
   GuideVariantPreference | undefined {
-  // `?lang=python&build=pyronaut` is not normalized: a Python guide variant
-  // exists even though the saved preference only knows the JVM languages.
   const query = readCodePreferenceQuery();
   if (query.language || query.buildTool) {
     const saved = readSavedGuideVariantPreference();
@@ -122,7 +128,7 @@ export function saveGuideVariantPreference(preference: GuideVariantPreference) {
     // The change event still updates the current page without storage.
   }
 
-  if (isGuideBuildTool(preference.buildTool)) {
+  if (isBuildTool(preference.buildTool)) {
     saveBuildToolPreference(preference.buildTool);
   }
 
