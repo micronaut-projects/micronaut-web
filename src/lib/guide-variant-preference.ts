@@ -100,6 +100,11 @@ function readSavedGuideVariantPreference(): GuideVariantPreference | undefined {
     stored = undefined;
   }
 
+  // The shared cookies only know the JVM languages and build tools, so they
+  // must not turn a saved Python/Pyronaut choice back into Java/Gradle.
+  if (stored?.language === "python") {
+    return normalizeGuidePreference(stored);
+  }
   const globalLanguage = readProgrammingLanguageCookiePreference();
   const globalBuildTool = readBuildToolCookiePreference();
 
