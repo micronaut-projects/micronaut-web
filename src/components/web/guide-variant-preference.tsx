@@ -16,6 +16,12 @@ import {
   PROGRAMMING_LANGUAGE_EVENT,
   saveProgrammingLanguagePreference,
 } from "@/lib/programming-language-preference";
+import {
+  CONFIG_FORMATS,
+  DEFAULT_CONFIG_FORMAT,
+  readConfigFormatPreference,
+  saveConfigFormatPreference,
+} from "@/lib/config-format-preference";
 import { cn } from "@/lib/utils";
 
 const LANGUAGES = [
@@ -47,9 +53,13 @@ function buildToolFor(language: string, current: string) {
  */
 export function GuideVariantPreferencePicker({
   initialLanguage = DEFAULT_GUIDE_VARIANT_PREFERENCE.language,
+  showConfigFormat = false,
 }: {
   initialLanguage?: string;
+  /** Docs snippets also have configuration tabs; guides do not pick them. */
+  showConfigFormat?: boolean;
 }) {
+  const [configFormat, setConfigFormat] = useState(DEFAULT_CONFIG_FORMAT);
   const [preference, setPreference] = useState<GuideVariantPreference>({
     ...DEFAULT_GUIDE_VARIANT_PREFERENCE,
     language: isGuideLanguage(initialLanguage)
@@ -63,6 +73,7 @@ export function GuideVariantPreferencePicker({
     if (stored) {
       setPreference(normalizeGuidePreference(stored));
     }
+    setConfigFormat(readConfigFormatPreference());
     setHydrated(true);
 
     function onPreferenceChange(event: Event) {
@@ -208,6 +219,24 @@ export function GuideVariantPreferencePicker({
           </Button>
         ))}
       </ButtonGroup>
+      {showConfigFormat && (
+        <ButtonGroup aria-label="Preferred configuration format">
+          {CONFIG_FORMATS.map((format) => (
+            <Button
+              key={format.value}
+              size="sm"
+              variant={configFormat === format.value ? "default" : "outline"}
+              aria-pressed={configFormat === format.value}
+              onClick={() => {
+                setConfigFormat(format.value);
+                saveConfigFormatPreference(format.value);
+              }}
+            >
+              {format.label}
+            </Button>
+          ))}
+        </ButtonGroup>
+      )}
     </div>
   );
 }
