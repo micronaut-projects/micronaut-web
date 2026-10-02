@@ -76,7 +76,12 @@ export function GuideVariantPreferencePicker({
     // becomes the saved preference, so it is still selected without the query.
     const query = readCodePreferenceQuery();
     if (stored && (query.language || query.buildTool)) {
-      saveGuideVariantPreference(normalizeGuidePreference(stored));
+      const saved = normalizeGuidePreference(stored);
+      saveGuideVariantPreference(saved);
+      // Docs snippets read the shared language cookie, not this preference.
+      if (isProgrammingLanguage(saved.language)) {
+        saveProgrammingLanguagePreference(saved.language);
+      }
     }
     if (isConfigFormat(query.configFormat)) {
       saveConfigFormatPreference(query.configFormat);
