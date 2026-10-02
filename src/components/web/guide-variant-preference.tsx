@@ -3,6 +3,15 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
+  isBuildTool,
+  saveBuildToolPreference,
+} from "@/lib/build-tool-preference";
+import { readCodePreferenceQuery } from "@/lib/code-preference-query";
+import {
+  isConfigFormat,
+  saveConfigFormatPreference,
+} from "@/lib/config-format-preference";
+import {
   DEFAULT_GUIDE_VARIANT_PREFERENCE,
   GUIDE_VARIANT_PREFERENCE_EVENT,
   isGuideLanguage,
@@ -62,6 +71,22 @@ export function GuideVariantPreferencePicker({
     const stored = readGuideVariantPreference();
     if (stored) {
       setPreference(normalizeGuidePreference(stored));
+    }
+    // A shared link such as `?lang=python&build=pyronaut&config-format=toml`
+    // becomes the saved preference, so it is still selected without the query.
+    const query = readCodePreferenceQuery();
+    if (stored && (query.language || query.buildTool)) {
+      const next = normalizeGuidePreference(stored);
+      saveGuideVariantPreference(next);
+      if (isProgrammingLanguage(next.language)) {
+        saveProgrammingLanguagePreference(next.language);
+      }
+      if (isBuildTool(next.buildTool)) {
+        saveBuildToolPreference(next.buildTool);
+      }
+    }
+    if (isConfigFormat(query.configFormat)) {
+      saveConfigFormatPreference(query.configFormat);
     }
     setHydrated(true);
 
