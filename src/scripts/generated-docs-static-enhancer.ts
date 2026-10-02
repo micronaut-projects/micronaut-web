@@ -10,6 +10,11 @@ import {
   saveBuildToolPreference,
 } from "@/lib/build-tool-preference";
 import { readCodePreferenceQuery } from "@/lib/code-preference-query";
+import {
+  isConfigFormat,
+  readConfigFormatCookiePreference,
+  saveConfigFormatPreference,
+} from "@/lib/config-format-preference";
 
 (() => {
   const snippetText = (block: Element) => {
@@ -238,9 +243,14 @@ import { readCodePreferenceQuery } from "@/lib/code-preference-query";
       });
     // Apply the saved preferences, then the URL query, to all snippets.
     const query = readCodePreferenceQuery();
+    // ?config-format= becomes the global choice, like a picked tab.
+    if (isConfigFormat(query.configFormat)) {
+      saveConfigFormatPreference(query.configFormat);
+    }
     for (const preference of [
       readProgrammingLanguageCookiePreference(),
       readBuildToolCookiePreference(),
+      readConfigFormatCookiePreference(),
       query.language,
       query.buildTool,
       query.configFormat,
