@@ -1,9 +1,10 @@
-export type ProgrammingLanguage = "java" | "kotlin" | "groovy";
+export type ProgrammingLanguage = "java" | "kotlin" | "groovy" | "python";
 
 export const PROGRAMMING_LANGUAGES: readonly ProgrammingLanguage[] = [
   "java",
   "kotlin",
   "groovy",
+  "python",
 ];
 
 export const PROGRAMMING_LANGUAGE_LABELS: Record<ProgrammingLanguage, string> =
@@ -11,6 +12,7 @@ export const PROGRAMMING_LANGUAGE_LABELS: Record<ProgrammingLanguage, string> =
     java: "Java",
     kotlin: "Kotlin",
     groovy: "Groovy",
+    python: "Python",
   };
 
 export const DEFAULT_PROGRAMMING_LANGUAGE: ProgrammingLanguage = "java";
@@ -20,7 +22,12 @@ export const PROGRAMMING_LANGUAGE_EVENT = "micronaut-web-language-change";
 export function isProgrammingLanguage(
   value: unknown,
 ): value is ProgrammingLanguage {
-  return value === "java" || value === "kotlin" || value === "groovy";
+  return (
+    value === "java" ||
+    value === "kotlin" ||
+    value === "groovy" ||
+    value === "python"
+  );
 }
 
 /**
