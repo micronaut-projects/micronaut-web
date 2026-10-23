@@ -1,7 +1,7 @@
 ---
 slug: 2026/03/16/micronaut-framework-4-10-10-released
 title: Micronaut Framework 4.10.10 Released!
-description: The Micronaut Foundation is excited to announce the release of Micronaut framework 4.10.10! It contains releases of Micronaut Core, and Micronaut Test. Potential denial of service attacks fixes Today, we published two security advisories that are fixed in Micronaut Core 4.10.10. Thus, strongly recommend that every user update to the latest version of Micronaut. DoS...
+description: We are excited to announce the release of Micronaut framework 4.10.10! It contains releases of Micronaut Core, and Micronaut Test. Potential denial of service attacks fixes Today, we published two security advisories that are fixed in Micronaut Core 4.10.10. Thus, strongly recommend that every user update to the latest version of Micronaut. DoS...
 date: '2026-03-16T10:01:54'
 modified: '2026-03-31T12:15:35'
 sourceUrl: https://micronaut.io/2026/03/16/micronaut-framework-4-10-10-released/
@@ -16,7 +16,7 @@ tags:
 href: /2026/03/16/micronaut-framework-4-10-10-released/
 ---
 
-The Micronaut Foundation is excited to announce the release of Micronaut framework 4.10.10! It contains releases of [Micronaut Core](https://github.com/micronaut-projects/micronaut-core/releases/tag/v4.10.18), and [Micronaut Test.](https://github.com/micronaut-projects/micronaut-test/releases/tag/v4.10.3)
+We are excited to announce the release of Micronaut framework 4.10.10! It contains releases of [Micronaut Core](https://github.com/micronaut-projects/micronaut-core/releases/tag/v4.10.18), and [Micronaut Test.](https://github.com/micronaut-projects/micronaut-test/releases/tag/v4.10.3)
 
 ## Potential denial of service attacks fixes
 

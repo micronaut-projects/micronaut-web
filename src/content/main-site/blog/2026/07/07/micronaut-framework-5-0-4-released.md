@@ -16,7 +16,7 @@ tags:
 href: /2026/07/07/micronaut-framework-5-0-4-released/
 ---
 
-The Micronaut Foundation is excited to announce the release of Micronaut framework 5.0.4! It includes a release of [Micronaut Core](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.0.5).
+We are excited to announce the release of Micronaut framework 5.0.4! It includes a release of [Micronaut Core](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.0.5).
 
 **We strongly recommend that users update to Micronaut 5.0.4**, as it ships with [Netty 4.2.16](http://netty.io/news/2026/07/06/4-2-16-Final.html), which fixes multiple CVEs.
 

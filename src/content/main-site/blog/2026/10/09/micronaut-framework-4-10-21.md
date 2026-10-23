@@ -14,7 +14,7 @@ tags:
 href: /2026/10/09/micronaut-framework-4-10-21/
 ---
 
-The Micronaut Foundation is excited to announce the release of [Micronaut Framework 4.10.21](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v4.10.21)!
+We are excited to announce the release of [Micronaut Framework 4.10.21](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v4.10.21)!
 
 **Micronaut Framework 4.10.21 is a security release.** It includes [Micronaut Core 4.10.31](https://github.com/micronaut-projects/micronaut-core/releases/tag/v4.10.31), which updates two managed dependencies to security releases:
 

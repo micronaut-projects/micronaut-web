@@ -50,9 +50,9 @@ href: /YYYY/MM/DD/micronaut-framework-X-Y-Z/
 
 Do not add `wordpressId`, `contentSource`, or a WordPress `sourceUrl` to a newly authored post. Link the supplied GitHub release URL and the component releases in the article when useful.
 
-Write a concise announcement in the Micronaut Foundation’s established voice:
+Write a concise announcement in a first-person plural voice. Use “We” instead of “The Micronaut Foundation” when announcing a release:
 
-1. Open by announcing the release and its version.
+1. Open with a first-person plural announcement of the release and its version, such as “We are excited to announce the release of Micronaut Framework <version>!”
 2. Summarize the component releases listed in the Platform release notes. Link each component name to the exact release URL and retain the released component version. Preserve the order from the source when practical.
 3. If the release notes explicitly identify CVEs, security advisories, or a security fix, add a clearly visible recommendation to upgrade and link the authoritative advisory or release note. Add `security-announcements` to `categories` only when the post is materially about security.
 4. Add a short “what’s new” section only when the release notes contain meaningful user-facing changes. Summarize them in original wording; do not paste the full changelog.

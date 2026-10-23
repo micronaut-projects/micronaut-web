@@ -15,7 +15,7 @@ tags:
 href: /2026/07/27/micronaut-framework-5-1-0-release/
 ---
 
-The Micronaut Foundation is excited to announce the release of Micronaut framework 5.1.0! If you haven’t yet updated to [Micronaut Framework 5](https://micronaut.io/2026/05/20/micronaut-framework-5-0-0-released/), this is an excellent opportunity to do so!
+We are excited to announce the release of Micronaut framework 5.1.0! If you haven’t yet updated to [Micronaut Framework 5](https://micronaut.io/2026/05/20/micronaut-framework-5-0-0-released/), this is an excellent opportunity to do so!
 
 # What's new in Micronaut 5.1.0
 

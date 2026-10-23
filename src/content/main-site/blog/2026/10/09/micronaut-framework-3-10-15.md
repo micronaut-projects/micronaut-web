@@ -14,7 +14,7 @@ tags:
 href: /2026/10/09/micronaut-framework-3-10-15/
 ---
 
-The Micronaut Foundation is excited to announce the release of [Micronaut Core 3.10.15](https://github.com/micronaut-projects/micronaut-core/releases/tag/v3.10.15)!
+We are excited to announce the release of [Micronaut Core 3.10.15](https://github.com/micronaut-projects/micronaut-core/releases/tag/v3.10.15)!
 
 **Micronaut Framework 3.10.15 is a security release.** It updates managed [Netty](https://netty.io/) to [`4.1.139.Final`](https://netty.io/news/2026/10/06/4-1-139-Final.html). This Netty security release fixes several vulnerabilities, including HTTP request/response smuggling, unbounded resource consumption in the HTTP, HTTP/2, DNS, and XML codecs, and an SNI routing bypass. **We strongly recommend that all Micronaut Framework 3 users update to Micronaut Framework 3.10.15.**
 

@@ -14,7 +14,7 @@ tags:
 href: /2026/10/07/micronaut-framework-5-2-2/
 ---
 
-The Micronaut Foundation is excited to announce the release of [Micronaut Framework 5.2.2](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.2)!
+We are excited to announce the release of [Micronaut Framework 5.2.2](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.2)!
 
 **Micronaut Framework 5.2.2 is a security release.** The highlight of this release is the update to Netty [`4.2.19.Final`](https://netty.io/news/2026/10/06/4-2-19-Final.html) in [Micronaut Core 5.2.15](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.2.15). Netty 4.2.19.Final fixes several security vulnerabilities, including HTTP request/response smuggling and unbounded resource consumption in the HTTP, HTTP/2, and HTTP/3 codecs. **We recommend that all users update to Micronaut Framework 5.2.2.**
 

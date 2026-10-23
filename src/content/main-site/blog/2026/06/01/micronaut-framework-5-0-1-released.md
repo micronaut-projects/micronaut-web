@@ -1,7 +1,7 @@
 ---
 slug: 2026/06/01/micronaut-framework-5-0-1-released
 title: Micronaut Framework 5.0.1 Released!
-description: The Micronaut Foundation is excited to announce the release of Micronaut framework 5.0.1. It includes Micronaut Core, Data, GraphQL, and JSON Schema releases, plus fixes for two security advisories.
+description: We are excited to announce the release of Micronaut framework 5.0.1. It includes Micronaut Core, Data, GraphQL, and JSON Schema releases, plus fixes for two security advisories.
 date: '2026-06-01T14:40:05'
 modified: '2026-06-01T14:40:05'
 sourceUrl: https://micronaut.io/2026/06/01/micronaut-framework-5-0-1-released/
@@ -15,7 +15,7 @@ tags: []
 href: /2026/06/01/micronaut-framework-5-0-1-released/
 ---
 
-The Micronaut Foundation is excited to announce the release of Micronaut framework 5.0.1! It includes releases of [Micronaut Core](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.0.1), [Micronaut Data](https://github.com/micronaut-projects/micronaut-data/releases/tag/v5.0.3), [Micronaut GraphQL](https://github.com/micronaut-projects/micronaut-graphql/releases/tag/v5.0.1), and [Micronaut JSON Schema](https://github.com/micronaut-projects/micronaut-json-schema/releases/tag/v2.0.1).
+We are excited to announce the release of Micronaut framework 5.0.1! It includes releases of [Micronaut Core](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.0.1), [Micronaut Data](https://github.com/micronaut-projects/micronaut-data/releases/tag/v5.0.3), [Micronaut GraphQL](https://github.com/micronaut-projects/micronaut-graphql/releases/tag/v5.0.1), and [Micronaut JSON Schema](https://github.com/micronaut-projects/micronaut-json-schema/releases/tag/v2.0.1).
 
 This release contains fixes for both [GHSA-387m-935m-c4vw](https://github.com/micronaut-projects/micronaut-core/security/advisories/GHSA-387m-935m-c4vw) and [GHSA-q6gh-6v2r-hjv3](https://github.com/micronaut-projects/micronaut-core/security/advisories/GHSA-q6gh-6v2r-hjv3) security advisories.
 

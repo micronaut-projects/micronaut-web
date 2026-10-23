@@ -14,7 +14,7 @@ tags:
 href: /2026/10/20/micronaut-framework-5-2-3/
 ---
 
-The Micronaut Foundation is excited to announce the release of [Micronaut Framework 5.2.3](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.3)!
+We are excited to announce the release of [Micronaut Framework 5.2.3](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.3)!
 
 **Micronaut Framework 5.2.3 is a security release.** The release notes for [Micronaut Core 5.2.17](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.2.17) and [Micronaut Security 5.4.1](https://github.com/micronaut-projects/micronaut-security/releases/tag/v5.4.1) list eight and two security advisories, respectively. **We strongly recommend that all users update to Micronaut Framework 5.2.3.**
 

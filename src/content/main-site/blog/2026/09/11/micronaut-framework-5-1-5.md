@@ -14,7 +14,7 @@ tags:
 href: /2026/09/11/micronaut-framework-5-1-5/
 ---
 
-The Micronaut Foundation is excited to announce the release of [Micronaut Framework 5.1.5](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.1.5)!
+We are excited to announce the release of [Micronaut Framework 5.1.5](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.1.5)!
 
 It includes [Micronaut Core 5.1.15](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.1.15), which updates managed [Netty](https://netty.io/) to 4.2.18.Final.
 

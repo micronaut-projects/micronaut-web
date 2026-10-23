@@ -14,7 +14,7 @@ tags:
 href: /2026/09/09/micronaut-framework-5-1-4/
 ---
 
-The Micronaut Foundation is excited to announce the release of [Micronaut Framework 5.1.4](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.1.4)!
+We are excited to announce the release of [Micronaut Framework 5.1.4](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.1.4)!
 
 It includes releases of [Micronaut Core 5.1.14](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.1.14) and [Micronaut Data 5.1.4](https://github.com/micronaut-projects/micronaut-data/releases/tag/v5.1.4).
 

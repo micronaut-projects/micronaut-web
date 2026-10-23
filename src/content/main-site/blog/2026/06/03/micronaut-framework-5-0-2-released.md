@@ -15,7 +15,7 @@ tags: []
 href: /2026/06/03/micronaut-framework-5-0-2-released/
 ---
 
-The Micronaut Foundation is excited to announce the release of Micronaut framework 5.0.2! It includes releases of [Micronaut Core 5.0.2](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.0.2), [Micronaut Data](https://github.com/micronaut-projects/micronaut-data/releases/tag/v5.0.4), [Micronaut Spring](https://github.com/micronaut-projects/micronaut-spring/releases/tag/v6.0.1), and [Micronaut Langchain4j](https://github.com/micronaut-projects/micronaut-langchain4j/releases/tag/v2.0.1).
+We are excited to announce the release of Micronaut framework 5.0.2! It includes releases of [Micronaut Core 5.0.2](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.0.2), [Micronaut Data](https://github.com/micronaut-projects/micronaut-data/releases/tag/v5.0.4), [Micronaut Spring](https://github.com/micronaut-projects/micronaut-spring/releases/tag/v6.0.1), and [Micronaut Langchain4j](https://github.com/micronaut-projects/micronaut-langchain4j/releases/tag/v2.0.1).
 
 **We strongly recommend that users update to Micronaut 5.0.2**, as it ships with [Netty 4.2.15](https://github.com/netty/netty/releases/tag/netty-4.2.15.Final), which fixes multiple CVEs.
 

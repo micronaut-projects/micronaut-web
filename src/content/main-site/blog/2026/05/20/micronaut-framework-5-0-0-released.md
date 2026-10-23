@@ -1,7 +1,7 @@
 ---
 slug: 2026/05/20/micronaut-framework-5-0-0-released
 title: Micronaut Framework 5.0.0 Released!
-description: The Micronaut Foundation is excited to announce the general availability (GA) release of Micronaut framework 5! Latest Versions Micronaut 5 is represented by the Micronaut Platform BOM and brings the framework, its modules, and the managed dependency ecosystem up to current major versions. Micronaut 4 was introduced almost three years ago, so Micronaut 5 is...
+description: We are excited to announce the general availability (GA) release of Micronaut framework 5! Latest Versions Micronaut 5 is represented by the Micronaut Platform BOM and brings the framework, its modules, and the managed dependency ecosystem up to current major versions. Micronaut 4 was introduced almost three years ago, so Micronaut 5 is...
 date: "2026-05-20T14:54:35"
 modified: "2026-05-20T14:54:35"
 sourceUrl: https://micronaut.io/2026/05/20/micronaut-framework-5-0-0-released/
@@ -17,7 +17,7 @@ tags:
 href: /2026/05/20/micronaut-framework-5-0-0-released/
 ---
 
-The Micronaut Foundation is excited to announce the general availability (GA) release of [Micronaut](https://micronaut.io/) framework 5!
+We are excited to announce the general availability (GA) release of [Micronaut](https://micronaut.io/) framework 5!
 
 ### Latest Versions
 
