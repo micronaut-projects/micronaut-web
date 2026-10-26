@@ -1,9 +1,11 @@
 import { readCodePreferenceQuery } from "@/lib/code-preference-query";
 import {
+  GUIDE_VARIANT_PREFERENCE_EVENT,
   matchGuideVariant,
   normalizeGuidePreference,
   readGuideVariantPreference,
   saveGuideVariantPreference,
+  type GuideVariantPreference,
 } from "@/lib/guide-variant-preference";
 import {
   isProgrammingLanguage,
@@ -12,11 +14,8 @@ import {
   type ProgrammingLanguage,
 } from "@/lib/programming-language-preference";
 
-// `?lang=`/`?build=` open the matching variant of this guide, keeping the
-// query so the link still says what it asked for.
-const query = readCodePreferenceQuery();
-if (query.language || query.buildTool) {
-  const variants = Array.from(
+function guideVariantLinks() {
+  return Array.from(
     document.querySelectorAll<HTMLAnchorElement>(
       "a[data-guide-variant-language][data-guide-variant-build-tool]",
     ),
@@ -26,14 +25,35 @@ if (query.language || query.buildTool) {
       buildTool: link.dataset.guideVariantBuildTool || "",
     }),
   );
-  const preference = readGuideVariantPreference();
-  const match = preference && matchGuideVariant(variants, preference);
+}
+
+// Opens this guide's variant for a preference, keeping the query and hash.
+function openGuideVariant(preference: GuideVariantPreference | undefined) {
+  const match =
+    preference && matchGuideVariant(guideVariantLinks(), preference);
   if (match && match.link.getAttribute("aria-current") !== "page") {
     window.location.replace(
       match.link.pathname + window.location.search + window.location.hash,
     );
   }
 }
+
+// `?lang=`/`?build=` open the matching variant of this guide, keeping the
+// query so the link still says what it asked for.
+const query = readCodePreferenceQuery();
+if (query.language || query.buildTool) {
+  openGuideVariant(readGuideVariantPreference());
+}
+
+// Picking a language or build tool above the guide switches to that variant;
+// a clicked variant link is already navigating there.
+let followingVariantLink = false;
+window.addEventListener(GUIDE_VARIANT_PREFERENCE_EVENT, (event) => {
+  if (followingVariantLink) {
+    return;
+  }
+  openGuideVariant((event as CustomEvent<GuideVariantPreference>).detail);
+});
 
 // Choosing a variant from the guide reader's "Different variants" list stores
 // the same preference the guides index uses for its "Read" links.
@@ -48,6 +68,7 @@ document.addEventListener("click", (event) => {
   const language = link?.dataset.guideVariantLanguage;
   const buildTool = link?.dataset.guideVariantBuildTool;
   if (language && buildTool) {
+    followingVariantLink = true;
     saveGuideVariantPreference({ language, buildTool });
     if (isProgrammingLanguage(language)) {
       saveProgrammingLanguagePreference(language);
