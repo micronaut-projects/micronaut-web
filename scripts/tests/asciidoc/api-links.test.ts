@@ -6,6 +6,7 @@ import {
   apiLink,
   packageLink,
   parseApiTarget,
+  projectApiBaseUri,
   projectPagesUri,
 } from "../../asciidoc/api-links.ts";
 
@@ -232,6 +233,32 @@ describe("projectPagesUri", () => {
     assert.equal(
       projectPagesUri({ project: { repositoryName: "micronaut-data" } }),
       "https://micronaut-projects.github.io/micronaut-data",
+    );
+  });
+});
+
+describe("projectApiBaseUri", () => {
+  test("links Core's javadoc by its minor line, not the patch release", () => {
+    for (const [version, line] of [
+      ["5.2.17", "5.2.x"],
+      ["5.0.0-M5", "5.0.x"],
+      ["4.10.33", "4.10x"],
+      ["3.10.10", "3.10x"],
+      ["", "latest"],
+    ]) {
+      assert.equal(
+        projectApiBaseUri({ project: { slug: "core", version } }),
+        `https://micronaut-projects.github.io/micronaut-docs/${line}/api`,
+      );
+    }
+  });
+
+  test("keeps a module's own release version", () => {
+    assert.equal(
+      projectApiBaseUri({
+        project: { repositoryName: "micronaut-data", version: "5.2.3" },
+      }),
+      "https://micronaut-projects.github.io/micronaut-data/5.2.3/api",
     );
   });
 });
