@@ -55,10 +55,30 @@ export type ResolvedLink = { href: string; label: string };
  * published by the platform release to the `micronaut-docs` Pages site;
  * `docs.micronaut.io/latest/api` was that tree's old address and now 404s,
  * because this site took the host over.
+ *
+ * Core's links name the minor line (`5.2.x`) rather than the patch: a tree per
+ * patch release pushed that Pages site past its 1 GB limit, so patch trees stop
+ * deploying while the line's alias always carries its newest patch.
  */
 export function projectApiBaseUri(context: ApiMacroContext): string {
   const version = context.project?.version || "latest";
-  return `${projectPagesUri(context)}/${version}/api`;
+  const pagesUri = projectPagesUri(context);
+  return `${pagesUri}/${
+    pagesUri.endsWith(`/${CORE_API_REPOSITORY}`)
+      ? coreApiVersion(version)
+      : version
+  }/api`;
+}
+
+// The 3.10 and 4.10 lines were published without the dot before `x`.
+const CORE_API_LINE_ALIASES: Record<string, string> = {
+  "3.10": "3.10x",
+  "4.10": "4.10x",
+};
+
+function coreApiVersion(version: string): string {
+  const line = /^(\d+\.\d+)\./.exec(version)?.[1];
+  return line ? CORE_API_LINE_ALIASES[line] || `${line}.x` : version;
 }
 
 /**
