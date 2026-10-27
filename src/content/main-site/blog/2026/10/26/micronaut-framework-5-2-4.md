@@ -14,9 +14,7 @@ tags:
 href: /2026/10/26/micronaut-framework-5-2-4/
 ---
 
-We are excited to announce the release of [Micronaut Framework 5.2.4](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.4)!
-
-**Micronaut Framework 5.2.4 is a security release.** The highlight of this release is [Micronaut Control Panel 2.2.1](https://github.com/micronaut-projects/micronaut-control-panel/releases/tag/v2.2.1), which fixes two high-severity vulnerabilities: [GHSA-f9fp-ghwv-vgqq](https://github.com/micronaut-projects/micronaut-control-panel/security/advisories/GHSA-f9fp-ghwv-vgqq) and [GHSA-mfx7-wpg7-324q](https://github.com/micronaut-projects/micronaut-control-panel/security/advisories/GHSA-mfx7-wpg7-324q). **We recommend that all users of Micronaut Control Panel update to Micronaut Framework 5.2.4.**
+We have released [Micronaut Framework 5.2.4](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.4), **a security release**. The highlight of this release is [Micronaut Control Panel 2.2.1](https://github.com/micronaut-projects/micronaut-control-panel/releases/tag/v2.2.1), which fixes two high-severity vulnerabilities: [GHSA-f9fp-ghwv-vgqq](https://github.com/micronaut-projects/micronaut-control-panel/security/advisories/GHSA-f9fp-ghwv-vgqq) and [GHSA-mfx7-wpg7-324q](https://github.com/micronaut-projects/micronaut-control-panel/security/advisories/GHSA-mfx7-wpg7-324q). **We recommend that all users of Micronaut Control Panel update to Micronaut Framework 5.2.4.**
 
 The release also includes configuration fixes in [Micronaut Core 5.2.20](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.2.20): property caches, config imports, environment refresh, and `${random.*}` values.
 
