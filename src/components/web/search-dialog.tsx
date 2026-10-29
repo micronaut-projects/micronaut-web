@@ -361,7 +361,17 @@ export function SearchDialog({
   }, [docs, guides, pages, posts, searchQuery, tags]);
 
   const navigateTo = (href: string) => {
-    window.location.href = withConfiguredBasePath(href, navigationUrls);
+    // The docs index sits at the root of the release line it was built for
+    // (`/5.2.x/search-index.json`), while the header bundle is shared from the
+    // main site and only knows the default docs root, so `/docs/` entries
+    // resolve against the index instead.
+    window.location.href =
+      mode === "docs" && docsSearchIndexUrl && href.startsWith("/docs/")
+        ? new URL(
+            href.slice("/docs/".length),
+            new URL(docsSearchIndexUrl, window.location.href),
+          ).toString()
+        : withConfiguredBasePath(href, navigationUrls);
     setOpen(false);
   };
 
