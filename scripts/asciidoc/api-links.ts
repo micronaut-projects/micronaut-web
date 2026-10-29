@@ -72,11 +72,16 @@ export function projectApiBaseUri(context: ApiMacroContext): string {
 
 /**
  * The line alias micronaut-projects/github-pages-deploy-action publishes next
- * to each release: its first four characters plus `x`, so `5.2.17` is `5.2.x`
- * and `4.10.33` is `4.10x`. The docs 404 page repeats this rule in the browser.
+ * to each release, `5.2.17` to `5.2.x`. It used to take the first four
+ * characters plus `x`, which left the 3.10 and 4.10 lines at `3.10x` and
+ * `4.10x`. The docs 404 page repeats this rule in the browser.
  */
 export function coreApiVersion(version: string): string {
-  return /^\d+\.\d+\./.test(version) ? `${version.slice(0, 4)}x` : version;
+  const line = /^(\d+\.\d+)\./.exec(version)?.[1];
+  if (!line) {
+    return version;
+  }
+  return line === "3.10" || line === "4.10" ? `${line}x` : `${line}.x`;
 }
 
 /**
