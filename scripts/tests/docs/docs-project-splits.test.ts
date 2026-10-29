@@ -50,6 +50,16 @@ describe("splitDocsProjects", () => {
     assert.equal(http.branch, core.branch);
   });
 
+  test("hands the promoted sections to the derived project only", () => {
+    const [core, http] = splitDocsProjects(
+      [coreProject()],
+      [{ ...split, promoteChildren: ["httpServer"] }],
+    );
+
+    assert.equal(core.guideSections?.promoteChildren, undefined);
+    assert.deepEqual(http.guideSections?.promoteChildren, ["httpServer"]);
+  });
+
   test("leaves projects without a split alone", () => {
     const data = docsProject({
       slug: "data",
@@ -119,6 +129,61 @@ describe("readGuideToc section selection", () => {
         ["2", "httpClient"],
       ],
     );
+  });
+
+  test("lifts the subsections of promoted sections to the top level", async (t) => {
+    const directory = await temporaryDirectory(t, "micronaut-web-split-");
+    await writeTextFile(
+      path.join(directory, "toc.yml"),
+      [
+        "title: Micronaut Core",
+        "introduction: Introduction",
+        "httpServer:",
+        "  title: The HTTP Server",
+        "  routing: HTTP Routing",
+        "  filters:",
+        "    title: HTTP Filters",
+        "    filterPatterns: Filter Patterns",
+        "httpClient: The HTTP Client",
+        "certificates: Certificate providers",
+      ].join("\n"),
+    );
+    for (const file of [
+      "introduction.adoc",
+      "httpServer.adoc",
+      "httpServer/routing.adoc",
+      "httpServer/filters.adoc",
+      "httpServer/filters/filterPatterns.adoc",
+      "httpClient.adoc",
+      "certificates.adoc",
+    ]) {
+      await writeTextFile(path.join(directory, file), "");
+    }
+
+    const http = await readGuideToc(directory, {
+      mode: "include",
+      sections: ["httpServer", "httpClient", "certificates"],
+      promoteChildren: ["httpServer", "httpClient"],
+    });
+
+    const flat = (nodes: typeof http.children): string[][] =>
+      nodes.flatMap((node) => [
+        [node.number, String(node.level), node.id, node.file],
+        ...flat(node.children),
+      ]);
+    assert.deepEqual(flat(http.children), [
+      ["1", "0", "httpServer", "httpServer.adoc"],
+      ["2", "0", "routing", path.join("httpServer", "routing.adoc")],
+      ["3", "0", "filters", path.join("httpServer", "filters.adoc")],
+      [
+        "3.1",
+        "1",
+        "filterPatterns",
+        path.join("httpServer", "filters", "filterPatterns.adoc"),
+      ],
+      ["4", "0", "httpClient", "httpClient.adoc"],
+      ["5", "0", "certificates", "certificates.adoc"],
+    ]);
   });
 
   test("skips a section the guide no longer has", async (t) => {
