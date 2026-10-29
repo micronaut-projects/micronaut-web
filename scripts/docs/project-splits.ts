@@ -19,6 +19,11 @@ export type DocsProjectSplit = {
   derived: Pick<DocsProject, "slug" | "displayName" | "projectKey">;
   /** Top-level TOC section ids the derived project takes over. */
   sections: readonly string[];
+  /**
+   * Sections of the derived project whose subsections it lists as top-level
+   * sections of their own, keeping the section itself as an introduction.
+   */
+  promoteChildren?: readonly string[];
 };
 
 export const DOCS_PROJECT_SPLITS: readonly DocsProjectSplit[] = [
@@ -30,6 +35,7 @@ export const DOCS_PROJECT_SPLITS: readonly DocsProjectSplit[] = [
       projectKey: "http",
     },
     sections: ["httpServer", "httpClient", "certificates"],
+    promoteChildren: ["httpServer", "httpClient"],
   },
 ];
 
@@ -37,6 +43,8 @@ export const DOCS_PROJECT_SPLITS: readonly DocsProjectSplit[] = [
 export type GuideSectionSelection = {
   mode: "include" | "exclude";
   sections: string[];
+  /** Selected sections whose subsections move up to the top level. */
+  promoteChildren?: string[];
 };
 
 /**
@@ -91,7 +99,13 @@ function derivedProject(
     displayName: split.derived.displayName,
     projectKey: split.derived.projectKey,
     derivedFrom: source.slug,
-    guideSections: { mode: "include", sections: [...split.sections] },
+    guideSections: {
+      mode: "include",
+      sections: [...split.sections],
+      ...(split.promoteChildren
+        ? { promoteChildren: [...split.promoteChildren] }
+        : {}),
+    },
   };
 }
 

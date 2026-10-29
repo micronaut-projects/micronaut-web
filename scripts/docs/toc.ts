@@ -27,7 +27,38 @@ export async function readGuideToc(
   await appendTocNodes(children, guideSourceDirectory, [], toc, 0, "");
   return {
     title: typeof toc.title === "string" ? toc.title : "",
-    children,
+    children: promoteChildren(children, sections?.promoteChildren),
+  };
+}
+
+/**
+ * Lifts the subsections of the named top-level sections to the top level,
+ * right after the section they came from, and renumbers the result. Source
+ * files are resolved before this, so a lifted section still reads from its
+ * original directory.
+ */
+function promoteChildren(
+  nodes: TocNode[],
+  promoted: readonly string[] | undefined,
+): TocNode[] {
+  if (!promoted?.length) {
+    return nodes;
+  }
+  const ids = new Set(promoted);
+  const lifted = nodes.flatMap((node) =>
+    ids.has(node.id) ? [{ ...node, children: [] }, ...node.children] : [node],
+  );
+  return lifted.map((node, index) => renumber(node, 0, String(index + 1)));
+}
+
+function renumber(node: TocNode, level: number, number: string): TocNode {
+  return {
+    ...node,
+    level,
+    number,
+    children: node.children.map((child, index) =>
+      renumber(child, level + 1, `${number}.${index + 1}`),
+    ),
   };
 }
 
