@@ -347,7 +347,9 @@ async function replaceDirectory(
  * GitHub Pages answers every missing path with the root `404.html`. This host
  * used to carry Core's javadoc at `/{version}/api/`, and module guides still
  * link it there; the javadoc is now published to Core's Pages site under the
- * same `{version}/api/` layout, so those requests are forwarded to it.
+ * same `{version}/api/` layout, so those requests are forwarded to it. Patch
+ * trees there no longer deploy, so a release goes to its line alias, by the
+ * rule `coreApiVersion` documents.
  */
 function docsNotFoundDocument(base: string): string {
   const javadocSite = projectPagesUri({ project: { slug: "core" } });
@@ -367,7 +369,7 @@ function docsNotFoundDocument(base: string): string {
     "<script>",
     `const base=${JSON.stringify(base)};`,
     'const [version,api,...page]=location.pathname.startsWith(base)?location.pathname.slice(base.length).split("/"):[];',
-    `if(version&&api==="api"){location.replace(${JSON.stringify(javadocSite)}+"/"+version+"/api/"+page.join("/")+location.search+location.hash);}`,
+    `if(version&&api==="api"){location.replace(${JSON.stringify(javadocSite)}+"/"+(/^\\d+\\.\\d+\\./.test(version)?version.slice(0,4)+"x":version)+"/api/"+page.join("/")+location.search+location.hash);}`,
     "</script>",
     "</head>",
     "<body>",

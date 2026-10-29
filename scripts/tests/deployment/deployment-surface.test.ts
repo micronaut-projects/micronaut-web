@@ -367,7 +367,28 @@ test("docs pruning publishes docs at the repository root", async (t) => {
   assert.match(notFoundHtml, /const base="\/micronaut-docs\/"/);
   assert.match(
     notFoundHtml,
-    /"https:\/\/micronaut-projects\.github\.io\/micronaut-docs"\+"\/"\+version\+"\/api\/"/,
+    /"https:\/\/micronaut-projects\.github\.io\/micronaut-docs"\+"\/"\+\(/,
+  );
+  const forward = (pathname: string) => {
+    let target = "";
+    new Function(
+      "location",
+      /<script>([\s\S]*?)<\/script>/.exec(notFoundHtml)![1],
+    )({
+      pathname,
+      search: "",
+      hash: "",
+      replace: (url: string) => (target = url),
+    });
+    return target;
+  };
+  assert.equal(
+    forward("/micronaut-docs/5.2.17/api/io/micronaut/Foo.html"),
+    "https://micronaut-projects.github.io/micronaut-docs/5.2.x/api/io/micronaut/Foo.html",
+  );
+  assert.equal(
+    forward("/micronaut-docs/4.10.33/api/"),
+    "https://micronaut-projects.github.io/micronaut-docs/4.10x/api/",
   );
   assert.match(
     await fs.readFile(path.join(dist, "latest.html"), "utf8"),
