@@ -390,6 +390,10 @@ test("docs pruning publishes docs at the repository root", async (t) => {
     forward("/micronaut-docs/4.10.33/api/"),
     "https://micronaut-projects.github.io/micronaut-docs/4.10x/api/",
   );
+  assert.equal(
+    forward("/micronaut-docs/5.10.1/api/"),
+    "https://micronaut-projects.github.io/micronaut-docs/5.10.x/api/",
+  );
   assert.match(
     await fs.readFile(path.join(dist, "latest.html"), "utf8"),
     /location\.replace/,
