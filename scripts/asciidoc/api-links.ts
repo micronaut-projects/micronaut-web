@@ -70,15 +70,13 @@ export function projectApiBaseUri(context: ApiMacroContext): string {
   }/api`;
 }
 
-// The 3.10 and 4.10 lines were published without the dot before `x`.
-const CORE_API_LINE_ALIASES: Record<string, string> = {
-  "3.10": "3.10x",
-  "4.10": "4.10x",
-};
-
-function coreApiVersion(version: string): string {
-  const line = /^(\d+\.\d+)\./.exec(version)?.[1];
-  return line ? CORE_API_LINE_ALIASES[line] || `${line}.x` : version;
+/**
+ * The line alias micronaut-projects/github-pages-deploy-action publishes next
+ * to each release: its first four characters plus `x`, so `5.2.17` is `5.2.x`
+ * and `4.10.33` is `4.10x`. The docs 404 page repeats this rule in the browser.
+ */
+export function coreApiVersion(version: string): string {
+  return /^\d+\.\d+\./.test(version) ? `${version.slice(0, 4)}x` : version;
 }
 
 /**
