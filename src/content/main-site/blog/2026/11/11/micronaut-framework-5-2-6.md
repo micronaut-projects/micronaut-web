@@ -14,9 +14,7 @@ tags:
 href: /2026/11/11/micronaut-framework-5-2-6/
 ---
 
-We are excited to announce the release of [Micronaut Framework 5.2.6](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.6)!
-
-**Micronaut Framework 5.2.6 is a security release.** [Micronaut Core 5.2.23](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.2.23) addresses 38 GitHub Security Advisories across HTTP servers and routing, clients, WebSockets, and static resource handling. [Micronaut Security 5.4.2](https://github.com/micronaut-projects/micronaut-security/releases/tag/v5.4.2) fixes vulnerabilities in URL authorization rules, OAuth and OpenID handling, CSRF protection, LDAP authentication, redirects, JWT validation, and token handling. **We strongly recommend that all users update to Micronaut Framework 5.2.6.**
+We have released [Micronaut Framework 5.2.6](https://github.com/micronaut-projects/micronaut-platform/releases/tag/v5.2.6), a security release. It updates to [Micronaut Core 5.2.23](https://github.com/micronaut-projects/micronaut-core/releases/tag/v5.2.23), which addresses 38 GitHub Security Advisories across HTTP servers and routing, clients, WebSockets, and static resource handling. It updates to [Micronaut Security 5.4.2](https://github.com/micronaut-projects/micronaut-security/releases/tag/v5.4.2), which fixes vulnerabilities in URL authorization rules, OAuth and OpenID handling, CSRF protection, LDAP authentication, redirects, JWT validation, and token handling. **We strongly recommend that all users update to Micronaut Framework 5.2.6.**
 
 The release also includes [Micronaut Data 5.2.5](https://github.com/micronaut-projects/micronaut-data/releases/tag/v5.2.5), which fixes repository data source selection for injection points and transaction manager selection for inherited methods.
 
