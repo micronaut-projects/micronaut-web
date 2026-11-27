@@ -1,0 +1,8 @@
+{
+  "extends": [
+    "local>micronaut-projects/micronaut-project-template//.github/renovate-global"
+  ],
+  "ignorePaths": [
+    "fixtures/**"
+  ]
+}
